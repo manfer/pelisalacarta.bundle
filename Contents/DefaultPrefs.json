@@ -6,6 +6,12 @@
     "default": "true"
   },
   {
+    "id": "debug",
+    "label": "Activar modo depuración",
+    "type": "bool",
+    "default": "false"
+  },
+  {
     "id": "fileniumpremium",
     "label": "Cuenta premium Filenium",
     "type": "bool",
