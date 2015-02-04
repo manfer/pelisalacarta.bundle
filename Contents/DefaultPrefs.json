@@ -146,6 +146,47 @@
     "secure": "true"
   },
   {
+    "id": "pordedesortlinks",
+    "type": "enum",
+    "default": "No",
+    "label": "Ordenar enlaces",
+    "values": [
+      "No",
+      "por Valoración",
+      "por Idioma",
+      "por Calidad",
+      "por Idioma y Calidad",
+      "por Idioma y Valoración",
+      "por Idioma, Calidad y Valoración"
+    ]
+  },
+  {
+    "id": "pordedeshowlinks",
+    "type": "enum",
+    "default": "Todos",
+    "label": "Mostrar enlaces",
+    "values": [
+      "Todos",
+      "Ver online",
+      "Descargar"
+    ]
+  },
+  {
+    "id": "pordedenumberlinks",
+    "type": "enum",
+    "default": "No",
+    "label": "Limitar número de enlaces",
+    "values": [
+      "No",
+      "5",
+      "10",
+      "15",
+      "20",
+      "25",
+      "30"
+    ]
+  },
+  {
     "id": "quebajamosaccount",
     "label": "Cuenta quebajamos",
     "type": "bool",
