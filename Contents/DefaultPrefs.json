@@ -1,0 +1,232 @@
+[
+  {
+    "id": "enableadultmode",
+    "label": "Activar modo adulto",
+    "type": "bool",
+    "default": "true"
+  },
+  {
+    "id": "fileniumpremium",
+    "label": "Cuenta premium Filenium",
+    "type": "bool",
+    "default": "false"
+  },
+  {
+    "id": "fileniumuser",
+    "label": "Usuario",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "id": "fileniumpassword",
+    "label": "Password",
+    "type": "text",
+    "option": "hidden",
+    "default": "",
+    "secure": "true"
+  },
+  {
+    "id": "realdebridpremium",
+    "label": "Cuenta premium Real Debrid",
+    "type": "bool",
+    "default": "false"
+  },
+  {
+    "id": "realdebriduser",
+    "label": "Usuario",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "id": "realdebridpassword",
+    "label": "Password",
+    "type": "text",
+    "option": "hidden",
+    "default": "",
+    "secure": "true"
+  },
+  {
+    "id": "alldebridpremium",
+    "label": "Cuenta premium All Debrid",
+    "type": "bool",
+    "default": "false"
+  },
+  {
+    "id": "alldebriduser",
+    "label": "Usuario",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "id": "alldebridpassword",
+    "label": "Password",
+    "type": "text",
+    "option": "hidden",
+    "default": "",
+    "secure": "true"
+  },
+  {
+    "id": "uploadedtopremium",
+    "label": "Cuenta premium uploaded.to",
+    "type": "bool",
+    "default": "false"
+  },
+  {
+    "id": "uploadedtouser",
+    "label": "Usuario",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "id": "uploadedtopassword",
+    "label": "Password",
+    "type": "text",
+    "option": "hidden",
+    "default": "",
+    "secure": "true"
+  },
+  {
+    "id": "mocosoftxaccount",
+    "label": "Cuenta MocosoftX",
+    "type": "bool",
+    "default": "false"
+  },
+  {
+    "id": "mocosoftxuser",
+    "label": "Usuario",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "id": "mocosoftxpassword",
+    "label": "Password",
+    "type": "text",
+    "option": "hidden",
+    "default": "",
+    "secure": "true"
+  },
+  {
+    "id": "serieslyaccount",
+    "label": "Cuenta Series.ly",
+    "type": "bool",
+    "default": "false"
+  },
+  {
+    "id": "serieslyuser",
+    "label": "Usuario",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "id": "serieslypassword",
+    "label": "Password",
+    "type": "text",
+    "option": "hidden",
+    "default": "",
+    "secure": "true"
+  },
+  {
+    "id": "pordedeaccount",
+    "label": "Cuenta pordede",
+    "type": "bool",
+    "default": "false"
+  },
+  {
+    "id": "pordedeuser",
+    "label": "Usuario",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "id": "pordedepassword",
+    "label": "Password",
+    "type": "text",
+    "option": "hidden",
+    "default": "",
+    "secure": "true"
+  },
+  {
+    "id": "quebajamosaccount",
+    "label": "Cuenta quebajamos",
+    "type": "bool",
+    "default": "false"
+  },
+  {
+    "id": "quebajamosuser",
+    "label": "Usuario",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "id": "quebajamospassword",
+    "label": "Password",
+    "type": "text",
+    "option": "hidden",
+    "default": "",
+    "secure": "true"
+  },
+  {
+    "id": "zampaseriesaccount",
+    "label": "Cuenta zampaseries",
+    "type": "bool",
+    "default": "false"
+  },
+  {
+    "id": "zampaseriesuser",
+    "label": "Usuario",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "id": "zampaseriespassword",
+    "label": "Password",
+    "type": "text",
+    "option": "hidden",
+    "default": "",
+    "secure": "true"
+  },
+  {
+    "id": "playmaxaccount",
+    "label": "Cuenta playmax",
+    "type": "bool",
+    "default": "false"
+  },
+  {
+    "id": "playmaxuser",
+    "label": "Usuario",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "id": "playmaxpassword",
+    "label": "Password",
+    "type": "text",
+    "option": "hidden",
+    "default": "",
+    "secure": "true"
+  },
+  {
+    "id": "personalchannel",
+    "label": "Canal personal",
+    "type": "bool",
+    "default": "false"
+  },
+  {
+    "id": "personalchannelname",
+    "label": "Nombre del canal",
+    "type": "text",
+    "default": "Ejemplo de canal personal"
+  },
+  {
+    "id": "personalchannellogo",
+    "label": "Logotipo del canal",
+    "type": "text",
+    "default": "http:\/\/pelisalacarta.mimediacenter.info\/personalchannel\/sample.png"
+  },
+  {
+    "id": "personalchannelurl",
+    "label": "URL del canal",
+    "type": "text",
+    "default": "http:\/\/pelisalacarta.mimediacenter.info\/personalchannel\/samplefeed.rss"
+  }
+]
