@@ -226,20 +226,20 @@ def siguientes(item):
     itemlist = []
     
     #for scrapedurl,scrapedtitle,scrapedthumbnail in matches:
-    for scrapedtitle,scrapedthumbnail,scrapedurl,scrapedsession,scrapedepisode in matches:
+    for scrapedtitle,scrapedthumbnail,scrapedurl,scrapedseason,scrapedepisode in matches:
         title = scrapertools.htmlclean(scrapedtitle)
-        session = scrapertools.htmlclean(scrapedsession)
+        season = scrapertools.htmlclean(scrapedseason)
         episode = scrapertools.htmlclean(scrapedepisode)
         thumbnail = urlparse.urljoin(item.url,scrapedthumbnail)
         plot = ""
-        title = session + "x" + episode + " - " + title
+        title = season + "x" + episode + " - " + title
         #http://www.pordede.com/peli/the-lego-movie
         #http://www.pordede.com/links/view/slug/the-lego-movie/what/peli?popup=1
 
         referer = urlparse.urljoin(item.url,scrapedurl)
         url = referer
         #itemlist.append( Item(channel=__channel__, action="episodios" , title=title , url=url, thumbnail=thumbnail, plot=plot, fulltitle=title, show=title, viewmode="movie"))
-        itemlist.append( Item(channel=__channel__, action="episodio" , title=title , url=url, thumbnail=thumbnail, plot=plot, fulltitle=title, show=title, viewmode="movie", extra=session+"|"+episode))
+        itemlist.append( Item(channel=__channel__, action="episodio" , title=title , url=url, thumbnail=thumbnail, plot=plot, fulltitle=title, show=title, viewmode="movie", extra=season+"|"+episode))
 
         if (DEBUG): logger.info("title=["+title+"], url=["+url+"], thumbnail=["+thumbnail+"]")
 
@@ -253,9 +253,9 @@ def episodio(item):
     data = scrapertools.cache_page(item.url)
     if (DEBUG): logger.info("data="+data)
 
-    session = str(int(item.extra.split("|")[0]))
+    season = str(int(item.extra.split("|")[0]))
     episode = str(int(item.extra.split("|")[1]))
-    patrontemporada = '<div class="checkSeason"[^>]+>Temporada '+session+'<div class="right" onclick="controller.checkSeason(.*?)\s+</div></div>'
+    patrontemporada = '<div class="checkSeason"[^>]+>Temporada '+season+'<div class="right" onclick="controller.checkSeason(.*?)\s+</div></div>'
     matchestemporadas = re.compile(patrontemporada,re.DOTALL).findall(data)
 
     for bloque_episodios in matchestemporadas:
@@ -268,7 +268,7 @@ def episodio(item):
         for scrapedurl,scrapedtitle,info,visto in matches:
             visto_string = "[visto] " if visto.strip()=="active" else ""
             numero=episode
-            title = visto_string+session+"x"+numero+" "+scrapertools.htmlclean(scrapedtitle)
+            title = visto_string+season+"x"+numero+" "+scrapertools.htmlclean(scrapedtitle)
             thumbnail = ""
             plot = ""
             #http://www.pordede.com/peli/the-lego-movie
