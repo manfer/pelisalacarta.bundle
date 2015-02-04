@@ -207,26 +207,6 @@
     "secure": "true"
   },
   {
-    "id": "zampaseriesaccount",
-    "label": "Cuenta zampaseries",
-    "type": "bool",
-    "default": "false"
-  },
-  {
-    "id": "zampaseriesuser",
-    "label": "Usuario",
-    "type": "text",
-    "default": ""
-  },
-  {
-    "id": "zampaseriespassword",
-    "label": "Password",
-    "type": "text",
-    "option": "hidden",
-    "default": "",
-    "secure": "true"
-  },
-  {
     "id": "playmaxaccount",
     "label": "Cuenta playmax",
     "type": "bool",
