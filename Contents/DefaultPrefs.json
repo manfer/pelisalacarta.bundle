@@ -7,7 +7,7 @@
   },
   {
     "id": "debug",
-    "label": "Activar modo depuración",
+    "label": "Activar modo depuraciÃ³n",
     "type": "bool",
     "default": "false"
   },
