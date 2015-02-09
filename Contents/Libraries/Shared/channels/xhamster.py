@@ -26,6 +26,8 @@ __adult__ = "true"
 
 DEBUG = config.get_setting("debug")
 
+BASE_URL = "http://es.xhamster.com/"
+
 def isGeneric():
     return True
 
@@ -37,7 +39,7 @@ def mainlist(item):
             channel = __channel__,
             action = "videos",
             title = "Novedades",
-            url = "http://es.xhamster.com/"
+            url = BASE_URL
         )
     )
     itemlist.append(
@@ -52,7 +54,7 @@ def mainlist(item):
             channel = __channel__,
             action = "videos",
             title = "Vídeos HD",
-            url = "http://es.xhamster.com/channels/new-hd_videos-1.html"
+            url = urlparse.urljoin( BASE_URL, "/channels/new-hd_videos-1.html" )
         )
     )
     itemlist.append(
@@ -60,7 +62,7 @@ def mainlist(item):
             channel = __channel__,
             action = "videos",
             title = "Recomendados",
-            url = "http://es.xhamster.com/recommended_for_me.php"
+            url = urlparse.urljoin( BASE_URL, "/recommended_for_me.php" )
         )
     )
     itemlist.append(
@@ -68,7 +70,7 @@ def mainlist(item):
             channel = __channel__,
             action = "videos",
             title = "Más Votados",
-            url = "http://es.xhamster.com/rankings/weekly-top-videos.html"
+            url = urlparse.urljoin( BASE_URL, "/rankings/weekly-top-videos.html" )
         )
     )
     itemlist.append(
@@ -76,7 +78,7 @@ def mainlist(item):
             channel = __channel__,
             action = "search",
             title = "Buscar",
-            url = "http://es.xhamster.com/search.php?q=%s&qcat=video"
+            url = urlparse.urljoin( BASE_URL, "/search.php?q=%s&qcat=video" )
         )
     )
     return itemlist
@@ -118,7 +120,7 @@ def videos(item):
                 channel = __channel__,
                 action = 'videos',
                 title = "<< Pagina anterior",
-                url = urlparse.urljoin( "http://es.xhamster.com", anterior[0] ),
+                url = urlparse.urljoin( BASE_URL, anterior[0] ),
                 thumbnail = "",
                 plot = "",
                 show = "!Página anterior"
@@ -134,7 +136,7 @@ def videos(item):
             scrapedtitle = unicode( title, "utf-8" ).encode("iso-8859-1")
         except:
             scrapedtitle = title
-        scrapedurl = urlparse.urljoin( "http://es.xhamster.com" , url )
+        scrapedurl = urlparse.urljoin( BASE_URL, url )
         scrapedthumbnail = thumbnail
         scrapedplot = ""
         # Depuracion
@@ -164,7 +166,7 @@ def videos(item):
                 channel = __channel__,
                 action = 'videos',
                 title = ">> Pagina siguiente",
-                url = urlparse.urljoin( "http://es.xhamster.com" , siguiente[0] ),
+                url = urlparse.urljoin( BASE_URL, siguiente[0] ),
                 thumbnail = "",
                 plot = "",
                 show = "!Página siguiente"
@@ -207,7 +209,7 @@ def listcategorias(item):
     itemlist = []
     unsorted = {}
 
-    data = scrapertools.cachePage('http://es.xhamster.com/channels.php')
+    data = scrapertools.cachePage( urlparse.urljoin( BASE_URL, '/channels.php' ) )
     data = scrapertools.find_single_match(data,'<div class="title">' + item.title + '</div>\s+</div>\s+<div class="list">(.*?)</div>\s+<div')
     #logger.debug(data)
 
@@ -216,7 +218,7 @@ def listcategorias(item):
     scrapertools.printMatches(matches)
 
     for scrapedurl,scrapedcategory in matches:
-        url = urlparse.urljoin( "http://es.xhamster.com" , scrapedurl )
+        url = urlparse.urljoin( BASE_URL, scrapedurl )
         category = remove_accents( scrapedcategory.strip() )
         unsorted[category] = [scrapedcategory, url]
 
