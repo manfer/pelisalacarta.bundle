@@ -131,25 +131,25 @@ def videos(item):
 
     patron = "<a href='([^']+)'[^<]+<img src='([^']+)' width='[^']+' height='[^']+' class='[^']+' alt=\"([^\"]+)\""
     matches = re.compile(patron,re.DOTALL).findall(data)
-    for url,thumbnail,title in matches:
+    for scrapedurl, scrapedthumbnail, scrapedtitle in matches:
         try:
-            scrapedtitle = unicode( title, "utf-8" ).encode("iso-8859-1")
+            title = unicode( scrapedtitle, "utf-8" ).encode( "iso-8859-1" )
         except:
-            scrapedtitle = title
-        scrapedurl = urlparse.urljoin( BASE_URL, url )
-        scrapedthumbnail = thumbnail
-        scrapedplot = ""
+            title = scrapedtitle
+        url = urlparse.urljoin( BASE_URL, scrapedurl )
+        thumbnail = scrapedthumbnail
+        plot = ""
         # Depuracion
-        if (DEBUG): logger.info("title=["+scrapedtitle+"], url=["+scrapedurl+"], thumbnail=["+scrapedthumbnail+"]")            
+        if (DEBUG): logger.info("title=["+title+"], url=["+url+"], thumbnail=["+thumbnail+"]")            
         itemlist.append(
             Item(
                 channel = __channel__,
                 action = "play",
-                title = scrapedtitle,
-                url = scrapedurl,
-                thumbnail = scrapedthumbnail,
-                plot = scrapedplot,
-                show = scrapedtitle,
+                title = title,
+                url = url,
+                thumbnail = thumbnail,
+                plot = plot,
+                show = title,
                 folder = False
             )
         )
@@ -217,7 +217,7 @@ def listcategorias(item):
     matches = re.compile(patron,re.DOTALL).findall(data)
     scrapertools.printMatches(matches)
 
-    for scrapedurl,scrapedcategory in matches:
+    for scrapedurl, scrapedcategory in matches:
         url = urlparse.urljoin( BASE_URL, scrapedurl )
         category = remove_accents( scrapedcategory.strip() )
         unsorted[category] = [scrapedcategory, url]
