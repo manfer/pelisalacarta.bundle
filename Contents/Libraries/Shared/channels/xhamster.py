@@ -32,12 +32,53 @@ def isGeneric():
 def mainlist(item):
     logger.info("[xhamster.py] mainlist")
     itemlist = []
-    itemlist.append( Item( channel=__channel__, action="videos", title="Novedades", url="http://es.xhamster.com/" ) )
-    itemlist.append( Item( channel=__channel__, action="listorientacionsexual", title="Categorías" ) )
-    itemlist.append( Item( channel=__channel__, action="videos", title="Vídeos HD", url="http://es.xhamster.com/channels/new-hd_videos-1.html" ) )
-    itemlist.append( Item( channel=__channel__, action="videos", title="Recomendados", url="http://es.xhamster.com/recommended_for_me.php" ) )
-    itemlist.append( Item( channel=__channel__, action="videos", title="Más Votados", url="http://es.xhamster.com/rankings/weekly-top-videos.html" ) )
-    itemlist.append( Item( channel=__channel__, action="search", title="Buscar", url="http://es.xhamster.com/search.php?q=%s&qcat=video" ) )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "videos",
+            title = "Novedades",
+            url = "http://es.xhamster.com/"
+        )
+    )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "listorientacionsexual",
+            title = "Categorías"
+        )
+    )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "videos",
+            title = "Vídeos HD",
+            url = "http://es.xhamster.com/channels/new-hd_videos-1.html"
+        )
+    )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "videos",
+            title = "Recomendados",
+            url = "http://es.xhamster.com/recommended_for_me.php"
+        )
+    )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "videos",
+            title = "Más Votados",
+            url = "http://es.xhamster.com/rankings/weekly-top-videos.html"
+        )
+    )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "search",
+            title = "Buscar",
+            url = "http://es.xhamster.com/search.php?q=%s&qcat=video"
+        )
+    )
     return itemlist
 
 # REALMENTE PASA LA DIRECCION DE BUSQUEDA
@@ -72,7 +113,17 @@ def videos(item):
     anterior = re.compile(patronvideos,re.DOTALL).findall(data)
     scrapertools.printMatches(anterior)
     if len(anterior)>0:
-        itemlist.append( Item(channel=__channel__, action='videos' , title="<< Pagina anterior" , url=urlparse.urljoin( "http://es.xhamster.com" , anterior[0] ), thumbnail="", plot="", show="!Página anterior") )
+        itemlist.append(
+            Item(
+                channel = __channel__,
+                action = 'videos',
+                title = "<< Pagina anterior",
+                url = urlparse.urljoin( "http://es.xhamster.com", anterior[0] ),
+                thumbnail = "",
+                plot = "",
+                show = "!Página anterior"
+            )
+        )
     else:
         paginador = None
 
@@ -88,16 +139,37 @@ def videos(item):
         scrapedplot = ""
         # Depuracion
         if (DEBUG): logger.info("title=["+scrapedtitle+"], url=["+scrapedurl+"], thumbnail=["+scrapedthumbnail+"]")            
-        itemlist.append( Item(channel=__channel__, action="play" , title=scrapedtitle , url=scrapedurl, thumbnail=scrapedthumbnail, plot=scrapedplot, show=scrapedtitle, folder=False))
+        itemlist.append(
+            Item(
+                channel = __channel__,
+                action = "play",
+                title = scrapedtitle,
+                url = scrapedurl,
+                thumbnail = scrapedthumbnail,
+                plot = scrapedplot,
+                show = scrapedtitle,
+                folder = False
+            )
+        )
         
     # EXTRAE EL PAGINADOR
     #<a href="/channels/new-grannies-2.html" class="last colR"><div class="icon iconPagerNextHover"></div>Próximo</a>
     #<a href="/channels/new-grannies-479.html" class="last" overicon="iconPagerNextHover"><div class="icon iconPagerNext"></div>Próximo</a>
-    patronvideos  = "<a href='([^']+)' class='last(?: colR)?'(?: overicon='iconPagerNextHover')?><div class='icon iconPagerNext"
+    patronvideos = "<a href='([^']+)' class='last(?: colR)?'(?: overicon='iconPagerNextHover')?><div class='icon iconPagerNext"
     siguiente = re.compile(patronvideos,re.DOTALL).findall(data)
     scrapertools.printMatches(siguiente)
     if len(siguiente)>0:
-        itemlist.append( Item(channel=__channel__, action='videos' , title=">> Pagina siguiente" , url=urlparse.urljoin( "http://es.xhamster.com" , siguiente[0] ), thumbnail="", plot="", show="!Página siguiente") )
+        itemlist.append(
+            Item(
+                channel = __channel__,
+                action = 'videos',
+                title = ">> Pagina siguiente",
+                url = urlparse.urljoin( "http://es.xhamster.com" , siguiente[0] ),
+                thumbnail = "",
+                plot = "",
+                show = "!Página siguiente"
+            )
+        )
     else:
         paginador = None
 
@@ -105,11 +177,29 @@ def videos(item):
 
 # SECCION ENCARGADA DE VOLCAR EL LISTADO DE CATEGORIAS CON EL LINK CORRESPONDIENTE A CADA PAGINA
 def listorientacionsexual(item):
-    logger.info("[xhamster.py] listcategorias")
+    logger.info("[xhamster.py] listorientacinosexual")
     itemlist = []
-    itemlist.append( Item( channel=__channel__, action="listcategorias", title="Heterosexual" ) )
-    itemlist.append( Item( channel=__channel__, action="listcategorias", title="Transexuales" ) )
-    itemlist.append( Item( channel=__channel__, action="listcategorias", title="Gays" ) )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "listcategorias",
+            title = "Heterosexual"
+        )
+    )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "listcategorias",
+            title = "Transexuales"
+        )
+    )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "listcategorias",
+            title = "Gays"
+        )
+    )
     return itemlist
 
 def listcategorias(item):
@@ -119,7 +209,7 @@ def listcategorias(item):
 
     data = scrapertools.cachePage('http://es.xhamster.com/channels.php')
     data = scrapertools.find_single_match(data,'<div class="title">' + item.title + '</div>\s+</div>\s+<div class="list">(.*?)</div>\s+<div')
-    logger.debug(data)
+    #logger.debug(data)
 
     patron  = '<a class="btnBig" href="([^"]+)">([^"]+)</a>'
     matches = re.compile(patron,re.DOTALL).findall(data)
@@ -131,7 +221,14 @@ def listcategorias(item):
         unsorted[category] = [scrapedcategory, url]
 
     for category in sorted(unsorted.keys()):
-        itemlist.append( Item( channel=__channel__, action="videos" , title=unsorted[category][0], url=unsorted[category][1] ) )
+        itemlist.append(
+            Item(
+                channel = __channel__,
+                action = "videos",
+                title = unsorted[category][0],
+                url = unsorted[category][1]
+            )
+        )
 
     return itemlist
 
@@ -144,8 +241,23 @@ def play(item):
     #logger.debug(data)
 
     url = scrapertools.get_match(data,'<video poster="[^"]+" type=\'video/mp4\' file="([^"]+)"')
-    logger.debug("url="+url)
-    itemlist.append( Item(channel=__channel__, action="play" , title=item.title, fulltitle=item.fulltitle , url=url, thumbnail=item.thumbnail, plot=item.plot, show=item.title, server="directo", folder=False))
+    logger.debug("url=" + url)
+
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "play",
+            title = item.title,
+            fulltitle = item.fulltitle,
+            url = url,
+            thumbnail = item.thumbnail,
+            plot = item.plot,
+            show = item.title,
+            server = "directo",
+            folder = False
+        )
+    )
+
     return itemlist
 
 
