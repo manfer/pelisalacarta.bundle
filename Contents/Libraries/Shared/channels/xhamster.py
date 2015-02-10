@@ -246,7 +246,7 @@ def listcategorias(item):
                 url = urlparse.urljoin( BASE_URL, scrapedurl )
             )
         )
-    itemlist = sorted(itemlist, key=lambda Item: Item.title)
+    itemlist = sorted(itemlist, key=lambda Item: Item.extra)
 
     return itemlist
 
