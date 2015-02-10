@@ -93,7 +93,6 @@ def search(item,texto):
         # Series
         item.url = "http://es.xhamster.com/search.php?q=%s&qcat=video"
         item.url = item.url % texto
-        item.extra = "search"
         itemlist.extend(videos(item))
         #itemlist = sorted(itemlist, key=lambda Item: Item.title)
 
@@ -129,12 +128,12 @@ def videos(item):
     patronvideos  = "<a href='([^']+)' class='first' overicon='iconPagerPrevHover'><div class='icon iconPagerPrev"
     anterior = re.compile(patronvideos,re.DOTALL).findall(data)
     scrapertools.printMatches(anterior)
-    if len(anterior)>0 and item.extra == "":
+    if len(anterior)>0:
         itemlist.append(
             Item(
                 channel = __channel__,
                 action = 'videos',
-                title = "<< Pagina anterior",
+                title = unicode( "<< Página anterior", "utf-8" ),
                 url = urlparse.urljoin( BASE_URL, anterior[0] ),
                 thumbnail = "",
                 plot = "",
@@ -179,12 +178,12 @@ def videos(item):
     patronvideos = "<a href='([^']+)' class='last(?: colR)?'(?: overicon='iconPagerNextHover')?><div class='icon iconPagerNext"
     siguiente = re.compile(patronvideos,re.DOTALL).findall(data)
     scrapertools.printMatches(siguiente)
-    if len(siguiente)>0 and item.extra == "":
+    if len(siguiente)>0:
         itemlist.append(
             Item(
                 channel = __channel__,
                 action = 'videos',
-                title = ">> Pagina siguiente",
+                title = unicode( ">> Página siguiente", "utf-8" ),
                 url = urlparse.urljoin( BASE_URL, siguiente[0] ),
                 thumbnail = "",
                 plot = "",
