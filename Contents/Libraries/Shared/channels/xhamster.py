@@ -91,10 +91,9 @@ def search(item,texto):
     texto = texto.replace( " ", "+" )
     try:
         # Series
-        item.url = "http://es.xhamster.com/search.php?q=%s&qcat=video"
+        item.url = urlparse.urljoin( BASE_URL, "/search.php?q=%s&qcat=video" )
         item.url = item.url % texto
         itemlist.extend(videos(item))
-        #itemlist = sorted(itemlist, key=lambda Item: Item.title)
 
         return itemlist
 
