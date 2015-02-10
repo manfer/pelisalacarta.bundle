@@ -126,6 +126,9 @@ def do_search_results(tecleado):
     #from channels import peliculasyonkis_generico
     #itemlist.extend( peliculasyonkis_generico.search( Item() , tecleado) )
 
+    from channels import pordede
+    itemlist.extend( pordede.search( Item() , tecleado) )
+
     #from channels import seriesyonkis
     #itemlist.extend( seriesyonkis.search( Item() , tecleado) )
 

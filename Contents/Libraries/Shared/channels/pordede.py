@@ -172,6 +172,7 @@ def parse_mixed_results(item,data):
         plot = ""
         #http://www.pordede.com/peli/the-lego-movie
         #http://www.pordede.com/links/view/slug/the-lego-movie/what/peli?popup=1
+        title = unicode( title, "utf-8")
 
         if "/peli/" in scrapedurl:
             referer = urlparse.urljoin(item.url,scrapedurl)
