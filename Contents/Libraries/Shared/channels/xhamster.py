@@ -77,8 +77,7 @@ def mainlist(item):
         Item(
             channel = __channel__,
             action = "search",
-            title = "Buscar",
-            url = urlparse.urljoin( BASE_URL, "/search.php?q=%s&qcat=video" )
+            title = "Buscar"
         )
     )
     return itemlist
@@ -87,14 +86,30 @@ def mainlist(item):
 
 def search(item,texto):
     logger.info("[xhamster.py] search")
-    tecleado = texto.replace( " ", "+" )
-    item.url = item.url % tecleado
-    return videos(item)
+    itemlist = []
+
+    texto = texto.replace( " ", "+" )
+    try:
+        # Series
+        item.url = "http://es.xhamster.com/search.php?q=%s&qcat=video"
+        item.url = item.url % texto
+        item.extra = "search"
+        itemlist.extend(videos(item))
+        #itemlist = sorted(itemlist, key=lambda Item: Item.title)
+
+        return itemlist
+
+    # Se captura la excepción, para no interrumpir al buscador global si un canal falla
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error( "%s" % line )
+        return []
 
 # SECCION ENCARGADA DE BUSCAR
 
 def videos(item):
-    logger.info("[xhamster.py] videos")
+    #logger.info("[xhamster.py] videos")
     data = scrapertools.downloadpageWithoutCookies(item.url)
     #data = scrapertools.get_match(data,'<td valign="top" id="video_title">(.*?)<div id="footer">')
     itemlist = []
@@ -114,7 +129,7 @@ def videos(item):
     patronvideos  = "<a href='([^']+)' class='first' overicon='iconPagerPrevHover'><div class='icon iconPagerPrev"
     anterior = re.compile(patronvideos,re.DOTALL).findall(data)
     scrapertools.printMatches(anterior)
-    if len(anterior)>0:
+    if len(anterior)>0 and item.extra == "":
         itemlist.append(
             Item(
                 channel = __channel__,
@@ -123,7 +138,8 @@ def videos(item):
                 url = urlparse.urljoin( BASE_URL, anterior[0] ),
                 thumbnail = "",
                 plot = "",
-                show = "!Página anterior"
+                show = "!Página anterior",
+                folder = False
             )
         )
     else:
@@ -133,34 +149,37 @@ def videos(item):
     matches = re.compile(patron,re.DOTALL).findall(data)
     for scrapedurl, scrapedthumbnail, scrapedtitle in matches:
         try:
-            title = unicode( scrapedtitle, "utf-8" ).encode( "iso-8859-1" )
+            #title = unicode( scrapedtitle, "utf-8" ).encode( "iso-8859-1" )
+            title = scrapedtitle.strip()
         except:
             title = scrapedtitle
         url = urlparse.urljoin( BASE_URL, scrapedurl )
         thumbnail = scrapedthumbnail
         plot = ""
         # Depuracion
-        if (DEBUG): logger.info("title=["+title+"], url=["+url+"], thumbnail=["+thumbnail+"]")            
+        #if (DEBUG): logger.info("title=["+title+"], url=["+url+"], thumbnail=["+thumbnail+"]")            
         itemlist.append(
             Item(
                 channel = __channel__,
                 action = "play",
                 title = title,
+                fulltitle = title,
                 url = url,
                 thumbnail = thumbnail,
                 plot = plot,
                 show = title,
+                viewmode = "movie",
                 folder = False
             )
         )
-        
+
     # EXTRAE EL PAGINADOR
     #<a href="/channels/new-grannies-2.html" class="last colR"><div class="icon iconPagerNextHover"></div>Próximo</a>
     #<a href="/channels/new-grannies-479.html" class="last" overicon="iconPagerNextHover"><div class="icon iconPagerNext"></div>Próximo</a>
     patronvideos = "<a href='([^']+)' class='last(?: colR)?'(?: overicon='iconPagerNextHover')?><div class='icon iconPagerNext"
     siguiente = re.compile(patronvideos,re.DOTALL).findall(data)
     scrapertools.printMatches(siguiente)
-    if len(siguiente)>0:
+    if len(siguiente)>0 and item.extra == "":
         itemlist.append(
             Item(
                 channel = __channel__,
@@ -169,7 +188,8 @@ def videos(item):
                 url = urlparse.urljoin( BASE_URL, siguiente[0] ),
                 thumbnail = "",
                 plot = "",
-                show = "!Página siguiente"
+                show = "!Página siguiente",
+                folder = False
             )
         )
     else:
@@ -218,19 +238,16 @@ def listcategorias(item):
     scrapertools.printMatches(matches)
 
     for scrapedurl, scrapedcategory in matches:
-        url = urlparse.urljoin( BASE_URL, scrapedurl )
-        category = remove_accents( scrapedcategory.strip() )
-        unsorted[category] = [scrapedcategory, url]
-
-    for category in sorted(unsorted.keys()):
         itemlist.append(
             Item(
                 channel = __channel__,
                 action = "videos",
-                title = unsorted[category][0],
-                url = unsorted[category][1]
+                title = scrapedcategory.strip(),
+                extra = remove_accents( scrapedcategory.strip() ),
+                url = urlparse.urljoin( BASE_URL, scrapedurl )
             )
         )
+    itemlist = sorted(itemlist, key=lambda Item: Item.title)
 
     return itemlist
 

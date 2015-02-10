@@ -62,27 +62,27 @@ def do_search_results(tecleado):
     #from pelisalacarta.channels import animeflv
     #itemlist.extend( animeflv.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import animeid
+    from channels import animeid
     itemlist.extend( animeid.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import bajui
+    from channels import bajui
     itemlist.extend( bajui.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import filmpertutti
+    from channels import filmpertutti
     itemlist.extend( filmpertutti.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import filmsenzalimiti
+    from channels import filmsenzalimiti
     itemlist.extend( filmsenzalimiti.search( Item() , tecleado) )
 
     #from pelisalacarta.channels import cineblog01
     #itemlist.extend( cineblog01.search( Item() , tecleado) )
     #itemlist.extend( cineblog01.searchserie( Item() , tecleado) )
 
-    from pelisalacarta.channels import cinetube
-    itemlist.extend( cinetube.search( Item() , tecleado, "F") )
+    #from channels import cinetube
+    #itemlist.extend( cinetube.search( Item() , tecleado, "F") )
 
-    from pelisalacarta.channels import cineonlineeu
-    itemlist.extend( cineonlineeu.search( Item() , tecleado) )
+    #from channels import cineonlineeu
+    #itemlist.extend( cineonlineeu.search( Item() , tecleado) )
 
     #from pelisalacarta.channels import cuevana
     #itemlist.extend( cuevana.search( Item() , tecleado) )
@@ -96,19 +96,19 @@ def do_search_results(tecleado):
     #from pelisalacarta.channels import cuevana
     #itemlist.extend( cuevana.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import divxatope
+    from channels import divxatope
     itemlist.extend( divxatope.search( Item() , tecleado) )
 
     #from pelisalacarta.channels import divxonline
     #itemlist.extend( divxonline.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import documaniatv
+    from channels import documaniatv
     itemlist.extend( documaniatv.search( Item() , tecleado) )
 
     #from pelisalacarta.channels import gnula
     #itemlist.extend( gnula.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import jkanime
+    from channels import jkanime
     itemlist.extend( jkanime.search( Item() , tecleado) )
 
     #from pelisalacarta.channels import newdivx
@@ -117,36 +117,39 @@ def do_search_results(tecleado):
     #from pelisalacarta.channels import newhd
     #itemlist.extend( newhd.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import peliculasaudiolatino
+    from channels import peliculasaudiolatino
     itemlist.extend( peliculasaudiolatino.search( Item() , tecleado) )
 
     #from pelisalacarta.channels import peliculasflv
     #itemlist.extend( peliculasflv.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import peliculasyonkis_generico
-    itemlist.extend( peliculasyonkis_generico.search( Item() , tecleado) )
+    #from channels import peliculasyonkis_generico
+    #itemlist.extend( peliculasyonkis_generico.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import seriesyonkis
-    itemlist.extend( seriesyonkis.search( Item() , tecleado) )
+    #from channels import seriesyonkis
+    #itemlist.extend( seriesyonkis.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import serieonline
+    from channels import serieonline
     itemlist.extend( serieonline.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import shurweb
+    from channels import shurweb
     itemlist.extend( shurweb.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import tumejortv
+    from channels import tumejortv
     itemlist.extend( tumejortv.search( Item() , tecleado) )
 
     if config.get_setting("serieslyaccount")=="true":
-        from pelisalacarta.channels import seriesly
+        from channels import seriesly
         itemlist.extend( seriesly.search( Item() , tecleado) )
 
     #from pelisalacarta.channels import seriesdanko
     #itemlist.extend( seriesdanko.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import veranime
+    from channels import veranime
     itemlist.extend( veranime.search( Item() , tecleado) )
+
+    from channels import xhamster
+    itemlist.extend( xhamster.search( Item() , tecleado) )
 
     itemlist.sort(key=lambda item: item.title.lower().strip())
     return itemlist
@@ -325,7 +328,7 @@ def por_teclado(params,url="",category=""):
             return
         if params.plot:
             channel = params.plot
-            exec "import pelisalacarta.channels."+channel+" as plugin"
+            exec "import channels."+channel+" as plugin"
         else:
             exec "import pelisalacarta."+channel+" as plugin"
 
@@ -340,7 +343,7 @@ def por_teclado(params,url="",category=""):
             return
         if params.get("plot"):
             channel = params.get("plot")
-            exec "import pelisalacarta.channels."+channel+" as plugin"
+            exec "import channels."+channel+" as plugin"
         else:
             exec "import pelisalacarta."+channel+" as plugin"
 
