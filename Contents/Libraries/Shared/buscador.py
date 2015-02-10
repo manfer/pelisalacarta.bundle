@@ -146,6 +146,10 @@ def do_search_results(tecleado):
         from channels import pordede
         itemlist.extend( pordede.search( Item() , tecleado) )
 
+    if server == "" or server == "pornhub":
+        from channels import pornhub
+        itemlist.extend( pornhub.search( Item() , tecleado) )
+
     #from channels import seriesyonkis
     #itemlist.extend( seriesyonkis.search( Item() , tecleado) )
 

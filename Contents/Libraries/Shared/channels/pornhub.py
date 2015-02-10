@@ -70,13 +70,34 @@ def mainlist(item):
         itemlist.sort(key=lambda x: x.title)
     return itemlist
 
+def search(item,texto):
+    logger.info("[pornhub.py] search")
+    itemlist = []
+
+    texto = texto.replace( " ", "+" )
+    try:
+        # Series
+        item.url = "http://es.pornhub.com/video/search?search=%s"
+        item.url = item.url % texto
+        itemlist.extend(peliculas(item))
+        #itemlist = sorted(itemlist, key=lambda Item: Item.title)
+
+        return itemlist
+
+    # Se captura la excepción, para no interrumpir al buscador global si un canal falla
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error( "%s" % line )
+        return []
+
 def peliculas(item):
     logger.info("[pornhub.py] peliculas")
     itemlist = []
        
     # Descarga la página
     data = get_main_page(item.url)
-    data = scrapertools.find_single_match(data,'<ul class="nf-videos videos row-4-thumbs">(.*?)<div class="pre-footer">')
+    data = scrapertools.find_single_match(data,'<ul class="(?:nf-videos )?videos row-4-thumbs">(.*?)<div class="pre-footer">')
     
     '''
     <li class="videoblock" id="37717631" _vkey="2064578485" >
