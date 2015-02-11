@@ -68,9 +68,25 @@ def mainlist(item):
     itemlist.append(
         Item(
             channel = __channel__,
-            action = "videos",
+            action = "frecuencia",
             title = "Más Votados",
-            url = urlparse.urljoin( BASE_URL, "/rankings/weekly-top-videos.html" )
+            url = urlparse.urljoin( BASE_URL, "/rankings/%s-top-videos.html" )
+        )
+    )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "frecuencia",
+            title = "Más Vistos",
+            url = urlparse.urljoin( BASE_URL, "/rankings/%s-top-viewed.html" )
+        )
+    )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "frecuencia",
+            title = "Más Comentados",
+            url = urlparse.urljoin( BASE_URL, "/rankings/%s-top-commented.html" )
         )
     )
     itemlist.append(
@@ -105,6 +121,22 @@ def search(item,texto):
         return []
 
 # SECCION ENCARGADA DE BUSCAR
+
+def frecuencia(item):
+    frecuencias = ["weekly", "montly", "alltime"]
+    itemlist = []
+
+    for frecuencia in frecuencias:
+        itemlist.append(
+            Item(
+                channel = __channel__,
+                action = "videos",
+                title = frecuencia.title(),
+                url = item.url % frecuencia
+            )
+        )
+
+    return itemlist
 
 def videos(item):
     #logger.info("[xhamster.py] videos")
