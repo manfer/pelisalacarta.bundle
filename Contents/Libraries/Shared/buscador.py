@@ -175,6 +175,9 @@ def do_search_results(tecleado):
 
     #from pelisalacarta.channels import seriesdanko
     #itemlist.extend( seriesdanko.search( Item() , tecleado) )
+    if server == "" or server == "tupornotv":
+        from channels import tupornotv
+        itemlist.extend( tupornotv.search( Item() , tecleado) )
 
     if server == "" or server == "veranime":
         from channels import veranime
