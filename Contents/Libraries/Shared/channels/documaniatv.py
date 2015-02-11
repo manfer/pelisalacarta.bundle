@@ -92,7 +92,7 @@ def categorias(item):
     data = scrapertools.cache_page(item.url)
 
     # Saca el bloque con las categorias
-    data = scrapertools.get_match(data,"""Categorias (.*?)</ul></li>""")
+    data = scrapertools.get_match(data,"""Categorias (.*?)</ul>\s*</li>""")
 
     #
     patron = '<li[^<]+<a href="([^"]+)"[^>]+>([^<]+)</a>'
