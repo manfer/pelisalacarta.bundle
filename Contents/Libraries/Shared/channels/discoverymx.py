@@ -31,7 +31,7 @@ def mainlist(item):
     itemlist=[]
     
     itemlist.append( Item(channel=__channel__, title="Documentales - Novedades"  , action="listvideos" , url="http://discoverymx.blogspot.com/"))
-    itemlist.append( Item(channel=__channel__, title="Documentales - Series Disponibles"  , action="DocuSeries" , url="http://discoverymx.blogspot.com/"))
+    itemlist.append( Item(channel=__channel__, title="Documentales - Populares"  , action="Populares" , url="http://discoverymx.blogspot.com/"))
     itemlist.append( Item(channel=__channel__, title="Documentales - Tag"  , action="DocuTag" , url="http://discoverymx.blogspot.com/"))
     itemlist.append( Item(channel=__channel__, title="Documentales - Archivo por meses"  , action="DocuARCHIVO" , url="http://discoverymx.blogspot.com/"))
 
@@ -110,23 +110,27 @@ def performsearch(texto):
         
     return resultados
 
-def DocuSeries(item):
+def Populares(item):
     logger.info("[discoverymx.py] DocuSeries")
     itemlist=[]
     
     # Descarga la página
     data = scrapertools.cache_page(item.url)
 
+    patron = "<div class='widget-content popular-posts'>(.*?)</ul>"
+    matches = re.compile(patron,re.DOTALL).findall(data)
+    logger.info(matches[0])
+
     # Extrae las entradas (carpetas)
-    patronvideos  = '<li><b><a href="([^"]+)" target="_blank">([^<]+)</a></b></li>'
-    matches = re.compile(patronvideos,re.DOTALL).findall(data)
+    patronvideos  = "<a href='([^']+)' target='_blank'>\s<img.*?src='([^']+)'.*?</a>.*?<a href='(?:[^']+)'>(.*?)</a>.*?<div class='item-snippet'>(.*?)</div>"
+    matches = re.compile(patronvideos,re.DOTALL).findall(matches[0])
     scrapertools.printMatches(matches)
 
     for match in matches:
         scrapedurl = match[0]
-        scrapedtitle = match[1]
-        scrapedthumbnail = ""
-        scrapedplot = ""
+        scrapedtitle = match[2]
+        scrapedthumbnail = match[1]
+        scrapedplot = match[3]
         if (DEBUG): logger.info("title=["+scrapedtitle+"], url=["+scrapedurl+"], thumbnail=["+scrapedthumbnail+"]")
         itemlist.append( Item(channel=__channel__, action="listvideos", title=scrapedtitle , url=scrapedurl , thumbnail=scrapedthumbnail , plot=scrapedplot , folder=True) )
 
@@ -138,13 +142,13 @@ def DocuTag(item):
 
     # Descarga la página
     data = scrapertools.cache_page(item.url)
-    patronvideos  =    "<a dir='ltr' href='([^']+)'>([^<]+)</a>[^<]+<span class='label-count' dir='ltr'>(.+?)</span>"
+    patronvideos = "<span class='label-size label-size-\d'>\s+<a dir='ltr' href='([^']+)'>(.*?)</a>"
     matches = re.compile(patronvideos,re.DOTALL).findall(data)
     scrapertools.printMatches(matches)
 
     for match in matches:
         scrapedurl = match[0]
-        scrapedtitle = match[1] + " " + match[2]
+        scrapedtitle = match[1]
         scrapedthumbnail = ""
         scrapedplot = ""
         if (DEBUG): logger.info("title=["+scrapedtitle+"], url=["+scrapedurl+"], thumbnail=["+scrapedthumbnail+"]")
