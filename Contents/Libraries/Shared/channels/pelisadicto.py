@@ -6,7 +6,6 @@
 #------------------------------------------------------------
 import urlparse,urllib2,urllib,re
 import os, sys
-import xbmc, xbmcgui
 
 from core import logger
 from core import config
@@ -21,80 +20,124 @@ __title__ = "Pelisadicto"
 __language__ = "ES"
 
 DEBUG = config.get_setting("debug")
+BASE_URL = "http://pelisadicto.com"
 
 def isGeneric():
     return True
 
 def mainlist(item):
-    logger.info("[cuevana.py] mainlist")
+    logger.info("[pelisadicto.py] mainlist")
 
     itemlist = []
-    itemlist.append( Item(channel=__channel__, title="Últimas agregadas"  , action="agregadas", url="http://pelisadicto.com"))
-    itemlist.append( Item(channel=__channel__, title="Listado por género" , action="porGenero", url="http://pelisadicto.com"))
-    itemlist.append( Item(channel=__channel__, title="Buscar" , action="buscar", url="http://pelisadicto.com") )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            title = "Portada",
+            action = "agregadas",
+            url = BASE_URL
+        )
+    )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            title = "Por Género",
+            action = "porGenero",
+            url = BASE_URL
+        )
+    )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            title = "Buscar",
+            action = "buscar",
+            url = BASE_URL
+        )
+    )
     
     return itemlist
 
+def search(item,texto):
+    logger.info("[pelisadicto.py] search")
+    itemlist = []
+
+    texto = texto.replace( " ", "+" )
+    try:
+        # Series
+        item.url = urlparse.urljoin( BASE_URL, "/buscar/%s" )
+        item.url = item.url % texto
+        itemlist.extend(agregadas(item))
+
+        return itemlist
+
+    # Se captura la excepción, para no interrumpir al buscador global si un canal falla
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error( "%s" % line )
+        return []
+
 def porGenero(item):
     itemlist = []
-    itemlist.append( Item(channel=__channel__ , action="agregadas" , title="Acción",url="http://pelisadicto.com/genero/Acción/1"))
-    itemlist.append( Item(channel=__channel__ , action="agregadas" , title="Adulto",url="http://pelisadicto.com/genero/Adulto/1"))
-    itemlist.append( Item(channel=__channel__ , action="agregadas" , title="Animación",url="http://pelisadicto.com/genero/Animación/1"))
-    itemlist.append( Item(channel=__channel__ , action="agregadas" , title="Aventura",url="http://pelisadicto.com/genero/Aventura/1"))
-    itemlist.append( Item(channel=__channel__ , action="agregadas" , title="Biográfico",url="http://pelisadicto.com/genero/Biográfico/1"))
-    itemlist.append( Item(channel=__channel__ , action="agregadas" , title="Ciencia Ficción",url="http://pelisadicto.com/genero/Ciencia Ficción/1"))
-    itemlist.append( Item(channel=__channel__ , action="agregadas" , title="Cine Negro",url="http://pelisadicto.com/genero/Cine Negro/1"))
-    itemlist.append( Item(channel=__channel__ , action="agregadas" , title="Comedia",url="http://pelisadicto.com/genero/Comedia/1"))
-    itemlist.append( Item(channel=__channel__ , action="agregadas" , title="Corto",url="http://pelisadicto.com/genero/Corto/1"))
-    itemlist.append( Item(channel=__channel__ , action="agregadas" , title="Crimen",url="http://pelisadicto.com/genero/Crimen/1"))
-    itemlist.append( Item(channel=__channel__ , action="agregadas" , title="Deporte",url="http://pelisadicto.com/genero/Deporte/1"))
-    itemlist.append( Item(channel=__channel__ , action="agregadas" , title="Documental",url="http://pelisadicto.com/genero/Documental/1"))
-    itemlist.append( Item(channel=__channel__ , action="agregadas" , title="Drama",url="http://pelisadicto.com/genero/Drama/1"))
-    itemlist.append( Item(channel=__channel__ , action="agregadas" , title="Familiar",url="http://pelisadicto.com/genero/Familiar/1"))
-    itemlist.append( Item(channel=__channel__ , action="agregadas" , title="Fantasía",url="http://pelisadicto.com/genero/Fantasía/1"))
-    itemlist.append( Item(channel=__channel__ , action="agregadas" , title="Guerra",url="http://pelisadicto.com/genero/Guerra/1"))
-    itemlist.append( Item(channel=__channel__ , action="agregadas" , title="Historia",url="http://pelisadicto.com/genero/Historia/1"))
-    itemlist.append( Item(channel=__channel__ , action="agregadas" , title="Misterio",url="http://pelisadicto.com/genero/Misterio/1"))
-    itemlist.append( Item(channel=__channel__ , action="agregadas" , title="Música",url="http://pelisadicto.com/genero/Música/1"))
-    itemlist.append( Item(channel=__channel__ , action="agregadas" , title="Musical",url="http://pelisadicto.com/genero/Musical/1"))
-    itemlist.append( Item(channel=__channel__ , action="agregadas" , title="Romance",url="http://pelisadicto.com/genero/Romance/1"))
-    itemlist.append( Item(channel=__channel__ , action="agregadas" , title="Terror",url="http://pelisadicto.com/genero/Terror/1"))
-    itemlist.append( Item(channel=__channel__ , action="agregadas" , title="Thriller",url="http://pelisadicto.com/genero/Thriller/1"))
-    itemlist.append( Item(channel=__channel__ , action="agregadas" , title="Western",url="http://pelisadicto.com/genero/Western/1"))
+
+    data = scrapertools.cache_page(item.url)
+
+    patron = '<li class="nav-header">Por género</li>.*?</ul>'
+    matches = re.compile(patron,re.DOTALL).findall(data)
+
+    patron = '<li><a href="([^"]+)" title=".*?">(.*?)</a></li>'
+    matches = re.compile(patron,re.DOTALL).findall(matches[0])
+
+    for url, title in matches:
+        itemlist.append(
+            Item(
+                channel = __channel__,
+                action = "agregadas",
+                title = title,
+                url = urlparse.urljoin( BASE_URL, url )
+            )
+        )
 
     return itemlist	
 
 def agregadas(item):
-    logger.info("[cuevana.py] novedades")
+    logger.info("[pelisadicto.py] agregadas")
     itemlist = []
     
     # Descarga la pagina
     data = scrapertools.cache_page(item.url)
     #logger.info("data="+data)
     # Extrae las entradas
-    patron  = '<li class="col-xs-6 col-sm-2 CALBR">.*?'
+    patron  = '<li class="col-xs-6 col-sm-2.*?">.*?'
     patron += '<a href="(.*?)".*?src="(.*?)".*?alt="(.*?)".*?calidad">(.*?)<.*?</li>'
     matches = re.compile(patron,re.DOTALL).findall(data)
-    for url,thumbnail,tit,calidad in matches:
-        url="http://pelisadicto.com"+url
-        data = scrapertools.cache_page(url)
-        patron = "<!-- SINOPSIS -->.*?"
-        patron += "<h2>.*?</h2>.*?"
-        patron += "<p>(.*?)</p>"
-        matches = re.compile(patron,re.DOTALL).findall(data)
-        plot = matches[0]
-        thumbnail = "http://pelisadicto.com"+thumbnail
-        itemlist.append( Item(channel=__channel__, action="findvideos3", title=tit, fulltitle=tit , url=url , thumbnail=thumbnail , plot=plot , show=tit, viewmode="movie_with_plot") )
+    for url, thumbnail, tit, calidad in matches:
+        url = urlparse.urljoin( "http://pelisadicto.com/", url )
+        thumbnail = urlparse.urljoin( "http://pelisadicto.com/", thumbnail )
+        itemlist.append(
+            Item(
+                channel = __channel__,
+                action = "findvideos3",
+                title = tit,
+                fulltitle = tit,
+                url = url,
+                thumbnail = thumbnail,
+                plot = "",
+                show = tit,
+                viewmode = "movie_with_plot"
+            )
+        )
     patron  = '<li class="active">.*?</li><li><span><a href="(.*?)"'
     matches = re.compile(patron,re.DOTALL).findall(data)
     if len(matches)>0:
-        parametro = matches[0]
-        patron = '<ul class="listitems">.*?<li><a href="(.*?)"'
-        matches = re.compile(patron,re.DOTALL).findall(data)
-        genero = matches[0]
-        genero = genero.replace("mejores-peliculas", "genero")
-        url = genero + "/" + parametro
-        itemlist.append( Item(channel=__channel__, action="agregadas", title="Página siguiente >>" , url=url) )
+        url = urlparse.urljoin( item.url, matches[0] )
+        itemlist.append(
+            Item(
+                channel = __channel__,
+                action = "agregadas",
+                title = u"Página siguiente >>",
+                url = url
+            )
+        )
 
     return itemlist
 

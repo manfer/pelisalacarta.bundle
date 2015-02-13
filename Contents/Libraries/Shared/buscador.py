@@ -146,6 +146,10 @@ def do_search_results(tecleado):
     #from channels import peliculasyonkis_generico
     #itemlist.extend( peliculasyonkis_generico.search( Item() , tecleado) )
 
+    if server == "" or server == "pelisadicto":
+        from channels import pelisadicto
+        itemlist.extend( pelisadicto.search( Item() , tecleado) )
+
     if server == "" or server == "pordede":
         from channels import pordede
         itemlist.extend( pordede.search( Item() , tecleado) )
