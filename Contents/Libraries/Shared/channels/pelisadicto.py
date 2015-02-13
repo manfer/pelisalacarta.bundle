@@ -62,7 +62,6 @@ def search(item,texto):
 
     texto = texto.replace( " ", "+" )
     try:
-        # Series
         item.url = urlparse.urljoin( BASE_URL, "/buscar/%s" )
         item.url = item.url % texto
         itemlist.extend(agregadas(item))
@@ -87,12 +86,12 @@ def porGenero(item):
     patron = '<li><a href="([^"]+)" title=".*?">(.*?)</a></li>'
     matches = re.compile(patron,re.DOTALL).findall(matches[0])
 
-    for url, title in matches:
+    for url, genero in matches:
         itemlist.append(
             Item(
                 channel = __channel__,
                 action = "agregadas",
-                title = title,
+                title = genero,
                 url = urlparse.urljoin( BASE_URL, url )
             )
         )
