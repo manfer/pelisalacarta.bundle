@@ -13,7 +13,6 @@ from core import scrapertools
 from core import config
 from core import logger
 from core.item import Item
-from pelisalacarta import buscador
 from servers import servertools
 
 __channel__ = "teledocumentales"
