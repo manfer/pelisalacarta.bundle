@@ -136,6 +136,10 @@ def do_search_results(tecleado):
     #from pelisalacarta.channels import newhd
     #itemlist.extend( newhd.search( Item() , tecleado) )
 
+    if server == "" or server == "oranline":
+        from channels import oranline
+        itemlist.extend( oranline.search( Item() , tecleado) )
+
     if server == "" or server == "peliculasaudiolatino":
         from channels import peliculasaudiolatino
         itemlist.extend( peliculasaudiolatino.search( Item() , tecleado) )

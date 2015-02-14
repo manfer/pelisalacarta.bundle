@@ -48,9 +48,9 @@ def menupeliculas(item):
 def search(item,texto):
     logger.info("pelisalacarta.channels.oranline search")
     if item.url=="":
-        item.url="http://www.oranline.com/?s="
+        item.url="http://www.oranline.com/?s=%s"
     texto = texto.replace(" ","+")
-    item.url = item.url+texto
+    item.url = item.url % texto
     try:
         return peliculas(item)
     # Se captura la excepción, para no interrumpir al buscador global si un canal falla
@@ -215,7 +215,7 @@ def idiomas(item):
     data = scrapertools.get_match(data,'<div class="widget"><h3>&Uacute;ltimos estrenos</h3>(.*?)</ul>')
 
     # Extrae las entradas
-    patron  = '<li class="cat-item cat-item-\d+"><a href="([^"]+)"[^>]+>([^<]+)</a>\s+\((\d+)\)'
+    patron  = '<li class="cat-item cat-item-\d+"><a href="([^"]+)"[^>]+>([^<]+)</a>\s+\((.*?)\)'
     matches = re.compile(patron,re.DOTALL).findall(data)
     scrapertools.printMatches(matches)
 
