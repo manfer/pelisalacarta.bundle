@@ -188,7 +188,7 @@ def parse_mixed_results(item,data):
         old_offset = scrapertools.find_single_match(item.url,"offset/(\d+)/")
         new_offset = int(old_offset)+30
         url = item.url.replace("offset/"+old_offset,"offset/"+str(new_offset))
-        itemlist.append( Item(channel=__channel__, action="lista" , title=">> Página siguiente" , extra=item.extra, url=url))
+        itemlist.append( Item(channel=__channel__, action="lista" , title=u"Página siguiente >>" , extra=item.extra, url=url))
 
     try:
         import xbmcplugin
@@ -369,7 +369,7 @@ def parse_listas(item, patron):
     nextpage = scrapertools.find_single_match(data,'data-url="(/lists/loadlists/offset/[^"]+)"')
     if nextpage != '':
         url = urlparse.urljoin(item.url,nextpage)
-        itemlist.append( Item(channel=__channel__, action="listas_sigues" , title=">> Página siguiente" , extra=item.extra, url=url))
+        itemlist.append( Item(channel=__channel__, action="listas_sigues" , title=u"Página siguiente >>" , extra=item.extra, url=url))
 
     try:
         import xbmcplugin
