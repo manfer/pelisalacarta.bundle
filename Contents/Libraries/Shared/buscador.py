@@ -195,7 +195,7 @@ def do_search_results(tecleado):
         from channels import xhamster
         itemlist.extend( xhamster.search( Item() , tecleado) )
 
-    itemlist.sort(key=lambda item: item.title.lower().strip())
+    #itemlist.sort(key=lambda item: item.title.lower().strip())
     return itemlist
 
 def salvar_busquedas(params,url="",category=""):
