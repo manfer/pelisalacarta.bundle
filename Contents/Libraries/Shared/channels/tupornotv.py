@@ -180,7 +180,7 @@ def novedades(item):
             Item(
                 channel = __channel__,
                 action = "novedades",
-                title = u">> Página siguiente",
+                title = u"Página siguiente >>",
                 url = scrapedurl,
                 folder = True
             )
