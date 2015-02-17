@@ -127,6 +127,7 @@ def peliculas(item):
         if "v.png" in idiomas:
             title=title+"VOSE,"
         title = title[:-1]+")"
+        title = unicode( title, "utf-8" )
         url=urlparse.urljoin(item.url,scrapedurl)
         thumbnail=urlparse.urljoin(item.url,scrapedthumbnail)
         plot=scrapedplot.strip()
@@ -135,11 +136,11 @@ def peliculas(item):
 
     try:
         next_page = scrapertools.get_match(data,"<a href='([^']+)'>\&rsaquo\;</a>")
-        itemlist.append( Item(channel=__channel__, action="peliculas", title=">> Página siguiente" , url=urlparse.urljoin(item.url,next_page) , folder=True) )
+        itemlist.append( Item(channel=__channel__, action="peliculas", title=u"Página siguiente >>" , url=urlparse.urljoin(item.url,next_page) , folder=True) )
     except:
         try:
             next_page = scrapertools.get_match(data,"<span class='current'>\d+</span><a href='([^']+)'")
-            itemlist.append( Item(channel=__channel__, action="peliculas", title=">> Página siguiente" , url=urlparse.urljoin(item.url,next_page) , folder=True) )
+            itemlist.append( Item(channel=__channel__, action="peliculas", title=u"Página siguiente >>" , url=urlparse.urljoin(item.url,next_page) , folder=True) )
         except:
             pass
         pass
