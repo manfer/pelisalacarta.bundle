@@ -142,6 +142,7 @@ def peliculas(item):
         title=scrapedtitle.replace('&amp;','&')+" ("+duration+")"
         scrapedhd = scrapertools.find_single_match(scrapedhd,'<span class="hd-thumbnail">(.*?)</span>')
         if (scrapedhd == 'HD') : title += ' [HD]'
+        title = unicode( title, "utf-8" )
         url= 'http://es.pornhub.com/embed/' + viewkey
                 
         if (DEBUG): logger.info("title=["+title+"], url=["+url+"], thumbnail=["+thumbnail+"]")
@@ -155,7 +156,7 @@ def peliculas(item):
     
     if len(matches)>0:
         url=urlparse.urljoin("http://es.pornhub.com",matches[0].replace('&amp;','&'))
-        itemlist.append( Item(channel=__channel__, action="peliculas", title=">> Página siguiente" ,fanart=__fanart__, url=url)) 
+        itemlist.append( Item(channel=__channel__, action="peliculas", title=u"Página siguiente >>" ,fanart=__fanart__, url=url)) 
     return itemlist
 
 
