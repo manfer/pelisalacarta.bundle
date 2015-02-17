@@ -77,6 +77,7 @@ def buscador(item,paginacion=True):
 
     for scrapedurl, scrapedtitle, scrapedthumbnail in matches:
         title = scrapertools.htmlclean(scrapedtitle)
+        title = unicode( title, "utf-8" )
         plot = ""
         url = scrapedurl
         thumbnail = scrapedthumbnail
@@ -122,6 +123,7 @@ def series(item):
 
     for scrapedurl, scrapedtitle, scrapedthumbnail in matches:
         title = scrapertools.htmlclean(scrapedtitle)
+        title = unicode( title, "utf-8" )
         plot = ""
         url = scrapedurl
         thumbnail = scrapedthumbnail
@@ -149,6 +151,7 @@ def episodios(item):
 
     for scrapedurl,scrapedtitle in matches:
         title = scrapertools.htmlclean(scrapedtitle).strip()
+        title = unicode( title, "utf-8" )
         url = scrapedurl
         plot = item.plot
         thumbnail = ""
@@ -173,6 +176,7 @@ def peliculas(item):
 
     for scrapedurl, scrapedtitle, scrapedthumbnail in matches:
         title = scrapertools.htmlclean(scrapedtitle)
+        title = unicode( title, "utf-8" )
         plot = ""
         url = scrapedurl
         thumbnail = scrapedthumbnail
