@@ -164,11 +164,10 @@ def videos(item):
             Item(
                 channel = __channel__,
                 action = 'videos',
-                title = unicode( "<< Página anterior", "utf-8" ),
+                title = u"<< Página anterior",
                 url = urlparse.urljoin( BASE_URL, anterior[0] ),
                 thumbnail = "",
                 plot = "",
-                show = "!Página anterior",
                 folder = False
             )
         )
@@ -183,6 +182,7 @@ def videos(item):
             title = scrapedtitle.strip()
         except:
             title = scrapedtitle
+        title = unicode( title, "utf-8" )
         url = urlparse.urljoin( BASE_URL, scrapedurl )
         thumbnail = scrapedthumbnail
         plot = ""
@@ -214,11 +214,10 @@ def videos(item):
             Item(
                 channel = __channel__,
                 action = 'videos',
-                title = unicode( ">> Página siguiente", "utf-8" ),
+                title = u"Página siguiente >>",
                 url = urlparse.urljoin( BASE_URL, siguiente[0] ),
                 thumbnail = "",
                 plot = "",
-                show = "!Página siguiente",
                 folder = False
             )
         )
