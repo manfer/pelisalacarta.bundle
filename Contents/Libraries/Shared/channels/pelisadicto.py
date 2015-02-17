@@ -109,19 +109,20 @@ def agregadas(item):
     patron  = '<li class="col-xs-6 col-sm-2.*?">.*?'
     patron += '<a href="(.*?)".*?src="(.*?)".*?alt="(.*?)".*?calidad">(.*?)<.*?</li>'
     matches = re.compile(patron,re.DOTALL).findall(data)
-    for url, thumbnail, tit, calidad in matches:
+    for url, thumbnail, title, calidad in matches:
         url = urlparse.urljoin( "http://pelisadicto.com/", url )
         thumbnail = urlparse.urljoin( "http://pelisadicto.com/", thumbnail )
+        title = unicode( title, "utf-8" )
         itemlist.append(
             Item(
                 channel = __channel__,
                 action = "findvideos3",
-                title = tit,
-                fulltitle = tit,
+                title = title,
+                fulltitle = title,
                 url = url,
                 thumbnail = thumbnail,
                 plot = "",
-                show = tit,
+                show = title,
                 viewmode = "movie_with_plot"
             )
         )
