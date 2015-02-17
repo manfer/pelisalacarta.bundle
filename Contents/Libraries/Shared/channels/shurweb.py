@@ -133,7 +133,7 @@ def series(item):
 
     next_page_url = scrapertools.find_single_match(data,'<li><a class="next page-numbers" href="([^"]+)">')
     if next_page_url!="":
-        itemlist.append( Item(channel=__channel__, action='series', title=">> Página siguiente" , url=next_page_url , thumbnail="" , plot=plot) )
+        itemlist.append( Item(channel=__channel__, action='series', title=u"Página siguiente >>" , url=next_page_url , thumbnail="" , plot=plot) )
 
     return itemlist
 
@@ -185,7 +185,7 @@ def peliculas(item):
 
     next_page_url = scrapertools.find_single_match(data,'<a class="nextpostslink" href="([^"]+)">')
     if next_page_url!="":
-        itemlist.append( Item(channel=__channel__, action='peliculas', title=">> Página siguiente" , url=next_page_url , thumbnail="" , plot=plot) )
+        itemlist.append( Item(channel=__channel__, action='peliculas', title=u"Página siguiente >>" , url=next_page_url , thumbnail="" , plot=plot) )
 
     return itemlist
 
