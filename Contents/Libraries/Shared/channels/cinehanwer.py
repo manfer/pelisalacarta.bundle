@@ -200,19 +200,6 @@ def peliculas(item):
 
     itemlist = []
 
-    #<a href="?page=1">1</a></li><li><a href="?page=2"><span><b>
-    previous_page = scrapertools.find_single_match(data,'<a href="([^"]+)">\d+</a></li[^<]+<li><a href="(?:[^"]+)"><span><b>')
-    if previous_page != "":
-        itemlist.append(
-            Item(
-                channel = __channel__,
-                action = "peliculas",
-                title = "<< Página anterior",
-                url = urlparse.urljoin( item.url, previous_page ),
-                folder = True
-            )
-        )
-
     # Extrae las entradas
     '''
     <a href="/pelicula/3708/tarzan.html" title="Tarzan" >
@@ -256,7 +243,7 @@ def peliculas(item):
             Item(
                 channel = __channel__,
                 action = "peliculas",
-                title = ">> Página siguiente",
+                title = u"Página siguiente >>",
                 url = urlparse.urljoin( item.url, next_page ),
                 folder = True
             )
