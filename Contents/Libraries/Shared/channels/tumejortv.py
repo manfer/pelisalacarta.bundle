@@ -234,7 +234,7 @@ def peliculas(item):
 
     itemlist = []
     for url,thumbnail,tipo,idioma,titulo,categoria,calidad in matches:
-        scrapedtitle = titulo+" ("+idioma.strip()+") ("+calidad+")"
+        scrapedtitle = unicode( titulo+" ("+idioma.strip()+") ("+calidad+")", "utf-8" )
         scrapedurl = url+"enlaces/"
         scrapedthumbnail = thumbnail
         scrapedplot = ""
@@ -259,7 +259,7 @@ def peliculas(item):
     patron = '<a href="([^"]+)">SIGUIENTE</a>'
     matches = re.compile(patron,re.DOTALL).findall(data)
     if len(matches)>0:
-        scrapedtitle = ">> Pagina siguiente"
+        scrapedtitle = u"Página siguiente >>"
         scrapedurl = matches[0]
         scrapedthumbnail = ""
         scrapedplot = ""
@@ -311,15 +311,26 @@ def series(item,extended=True):
 
     itemlist = []
     for url,thumbnail,tipo,idioma,titulo,categoria,calidad in matches:
-        scrapedtitle = titulo.strip()
+        scrapedtitle = unicode( titulo.strip(), "utf-8" )
         if extended:
-            scrapedtitle = scrapedtitle +" ("+idioma.strip()+") ("+scrapertools.htmlclean(calidad)+")"
+            scrapedtitle = unicode( scrapedtitle +" ("+idioma.strip()+") ("+scrapertools.htmlclean(calidad)+")", "utf-8" )
         scrapedurl = url+"capitulos/"
         scrapedthumbnail = thumbnail
         scrapedplot = ""
         if (DEBUG): logger.info("title=["+scrapedtitle+"], url=["+scrapedurl+"], thumbnail=["+scrapedthumbnail+"]")
 
-        itemlist.append( Item(channel=__channel__, action="findepisodios" , title=scrapedtitle , fulltitle=scrapedtitle, url=scrapedurl, thumbnail=scrapedthumbnail, plot=scrapedplot, show=titulo.strip()))
+        itemlist.append(
+            Item(
+                channel = __channel__,
+                action = "findepisodios",
+                title = scrapedtitle,
+                fulltitle = scrapedtitle,
+                url = scrapedurl,
+                thumbnail = scrapedthumbnail,
+                plot = scrapedplot,
+                show = unicode( titulo.strip(), "utf-8" )
+            )
+        )
 
     # Ordena los listados alfabeticos
     if "filtro_letras" in item.url:
@@ -329,7 +340,7 @@ def series(item,extended=True):
     patron = '<a href="([^"]+)">SIGUIENTE</a>'
     matches = re.compile(patron,re.DOTALL).findall(data)
     if len(matches)>0:
-        scrapedtitle = ">> Pagina siguiente"
+        scrapedtitle = u"Pagina siguiente >>"
         scrapedurl = matches[0]
         scrapedthumbnail = ""
         scrapedplot = ""
