@@ -78,6 +78,10 @@ def do_search_results(tecleado):
         from channels import bajui
         itemlist.extend( bajui.search( Item() , tecleado) )
 
+    if server == "" or server == "beeg":
+        from channels import beeg
+        itemlist.extend( beeg.search( Item() , tecleado) )
+
     if server == "" or server == "cinehanwer":
         from channels import cinehanwer
         itemlist.extend( cinehanwer.search( Item() , tecleado) )
