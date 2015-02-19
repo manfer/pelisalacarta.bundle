@@ -158,7 +158,7 @@ def do_search_results(tecleado):
         from channels import pelisadicto
         itemlist.extend( pelisadicto.search( Item() , tecleado) )
 
-    if server == "" or server == "pordede":
+    if config.get_setting("pordedeaccount")=="true" and (server == "" or server == "pordede"):
         from channels import pordede
         itemlist.extend( pordede.search( Item() , tecleado) )
 
