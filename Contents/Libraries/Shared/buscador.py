@@ -78,7 +78,7 @@ def do_search_results(tecleado):
         from channels import bajui
         itemlist.extend( bajui.search( Item() , tecleado) )
 
-    if server == "" or server == "beeg":
+    if config.get_setting("enableadultmode")=="true" and (server == "" or server == "beeg"):
         from channels import beeg
         itemlist.extend( beeg.search( Item() , tecleado) )
 
@@ -162,7 +162,7 @@ def do_search_results(tecleado):
         from channels import pordede
         itemlist.extend( pordede.search( Item() , tecleado) )
 
-    if server == "" or server == "pornhub":
+    if config.get_setting("enableadultmode")=="true" and (server == "" or server == "pornhub"):
         from channels import pornhub
         itemlist.extend( pornhub.search( Item() , tecleado) )
 
@@ -187,7 +187,7 @@ def do_search_results(tecleado):
 
     #from pelisalacarta.channels import seriesdanko
     #itemlist.extend( seriesdanko.search( Item() , tecleado) )
-    if server == "" or server == "tupornotv":
+    if config.get_setting("enableadultmode")=="true" and (server == "" or server == "tupornotv"):
         from channels import tupornotv
         itemlist.extend( tupornotv.search( Item() , tecleado) )
 
@@ -195,7 +195,7 @@ def do_search_results(tecleado):
         from channels import veranime
         itemlist.extend( veranime.search( Item() , tecleado) )
 
-    if server == "" or server == "xhamster":
+    if config.get_setting("enableadultmode")=="true" and (server == "" or server == "xhamster"):
         from channels import xhamster
         itemlist.extend( xhamster.search( Item() , tecleado) )
 
