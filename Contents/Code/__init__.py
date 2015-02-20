@@ -249,7 +249,7 @@ def canal(channel_name="",action="",caller_item_serialized=None):
                     url = "pelisalacarta://" + item.url
                 )
 
-                oc.art = item.thumbnail
+                oc.art = item.art
                 oc.add(videoClipObject)
 
     except:
@@ -273,7 +273,8 @@ def play_video(item):
                 action = "play",
                 title = item.title, #"Ver el video "+video_url[0],
                 url = video_url[1],
-                thumbnail = video_url[2] if (len(video_url) == 3) else item.thumbnail,
+                thumbnail = item.thumbnail,
+                art = video_url[2] if (len(video_url) == 3) else item.thumbnail,
                 plot = item.plot,
                 server = ""
             )
