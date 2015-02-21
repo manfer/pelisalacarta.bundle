@@ -27,17 +27,43 @@ __creationdate__ = "20140615"
 DEFAULT_HEADERS = []
 DEFAULT_HEADERS.append( ["User-Agent","Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; es-ES; rv:1.9.2.12) Gecko/20101026 Firefox/3.6.12"] )
 
+PDD_BASE_URL = "http://www.pordede.com/"
+PDD_LOGIN = urlparse.urljoin( PDD_BASE_URL, "/site/login" )
+
+PDD_SERIES_NEWS = urlparse.urljoin( PDD_BASE_URL, "/series/loadmedia/offset/0/showlist/hot" )
+PDD_SERIES_GENRES = urlparse.urljoin( PDD_BASE_URL, "/series" )
+PDD_SERIES_FOLLOWING = urlparse.urljoin( PDD_BASE_URL, "/series/following" )
+PDD_SERIES_NEXT_EPISODES = PDD_BASE_URL
+PDD_SERIES_FAVORITES = urlparse.urljoin( PDD_BASE_URL, "/series/favorite" )
+PDD_SERIES_PENDING = urlparse.urljoin( PDD_BASE_URL, "/series/pending" )
+PDD_SERIES_SEEN = urlparse.urljoin( PDD_BASE_URL, "/series/seen" )
+PDD_SERIES_RECOMMENDED = urlparse.urljoin( PDD_BASE_URL, "/series/recommended" )
+PDD_SERIES_SEARCH = urlparse.urljoin( PDD_BASE_URL, "/series" )
+
+PDD_PELIS_NEWS = urlparse.urljoin( PDD_BASE_URL, "/pelis/loadmedia/offset/0/showlist/hot" )
+PDD_PELIS_GENRES = urlparse.urljoin( PDD_BASE_URL, "/pelis" )
+PDD_PELIS_FAVORITES = urlparse.urljoin( PDD_BASE_URL, "/pelis/favorite" )
+PDD_PELIS_PENDING = urlparse.urljoin( PDD_BASE_URL, "/pelis/pending" )
+PDD_PELIS_SEEN = urlparse.urljoin( PDD_BASE_URL, "/pelis/seen" )
+PDD_PELIS_RECOMMENDED = urlparse.urljoin( PDD_BASE_URL, "/pelis/recommended" )
+PDD_PELIS_SEARCH = urlparse.urljoin( PDD_BASE_URL, "/pelis" )
+
+PDD_FOLLOWING_LISTS = urlparse.urljoin( PDD_BASE_URL, "/lists/following" )
+PDD_YOUR_LISTS = urlparse.urljoin( PDD_BASE_URL, "/lists/yours" )
+PDD_TOP_LISTS = urlparse.urljoin( PDD_BASE_URL, "/lists" )
+
 def isGeneric():
     return True
 
 def login():
-
-    url = "http://www.pordede.com/site/login"
-    post = "LoginForm[username]="+config.get_setting("pordedeuser")+"&LoginForm[password]="+config.get_setting("pordedepassword")
-    data = scrapertools.cache_page(url,post=post)
+    logger.info("[pordede.py] login")
+    user = config.get_setting("pordedeuser")
+    password = config.get_setting("pordedepassword")
+    post = "LoginForm[username]=" + user + "&LoginForm[password]=" + password
+    data = scrapertools.cache_page( PDD_LOGIN, post = post )
 
 def mainlist(item):
-    logger.info("pelisalacarta.channels.pordede mainlist")
+    logger.info("[pordede.py] mainlist")
 
     itemlist = []
 
@@ -72,28 +98,12 @@ def mainlist(item):
         itemlist.append(
             Item(
                 channel = __channel__,
-                action = "listas_sigues",
-                title = u"Listas que sigues",
-                url = "http://www.pordede.com/lists/following"
+                action = "menulistas",
+                title = u"Listas",
+                url = ""
             )
         )
-        itemlist.append(
-            Item(
-                channel = __channel__,
-                action = "tus_listas",
-                title = u"Tus listas",
-                url = "http://www.pordede.com/lists/yours"
-            )
-        )
-        itemlist.append(
-            Item(
-                channel = __channel__,
-                action = "listas_sigues",
-                title = u"Top listas",
-                url = "http://www.pordede.com/lists"
-            )
-        )
-       
+
     return itemlist
 
 def openconfig(item):
@@ -102,7 +112,7 @@ def openconfig(item):
     return []
 
 def menuseries(item):
-    logger.info("pelisalacarta.channels.pordede menuseries")
+    logger.info("[pordede.py] menuseries")
 
     itemlist = []
     itemlist.append(
@@ -110,7 +120,7 @@ def menuseries(item):
             channel = __channel__,
             action = "peliculas",
             title = u"Novedades",
-            url = "http://www.pordede.com/series/loadmedia/offset/0/showlist/hot"
+            url = PDD_SERIES_NEWS
         )
     )
     itemlist.append(
@@ -118,7 +128,7 @@ def menuseries(item):
             channel = __channel__,
             action = "generos",
             title = u"Por géneros",
-            url = "http://www.pordede.com/series"
+            url = PDD_SERIES_GENRES
         )
     )
     itemlist.append(
@@ -126,7 +136,7 @@ def menuseries(item):
             channel = __channel__,
             action = "peliculas",
             title = u"Siguiendo",
-            url = "http://www.pordede.com/series/following"
+            url = PDD_SERIES_FOLLOWING
         )
     )
     itemlist.append(
@@ -134,7 +144,7 @@ def menuseries(item):
             channel = __channel__,
             action = "siguientes",
             title = u"Siguientes Capítulos",
-            url = "http://www.pordede.com"
+            url = PDD_SERIES_NEXT_EPISODES
         )
     )
     itemlist.append(
@@ -142,7 +152,7 @@ def menuseries(item):
             channel = __channel__,
             action = "peliculas",
             title = u"Favoritas",
-            url = "http://www.pordede.com/series/favorite"
+            url = PDD_SERIES_FAVORITES
         )
     )
     itemlist.append(
@@ -150,7 +160,7 @@ def menuseries(item):
             channel = __channel__,
             action = "peliculas",
             title = u"Pendientes",
-            url = "http://www.pordede.com/series/pending"
+            url = PDD_SERIES_PENDING
         )
     )
     itemlist.append(
@@ -158,7 +168,7 @@ def menuseries(item):
             channel = __channel__,
             action = "peliculas",
             title = u"Terminadas",
-            url = "http://www.pordede.com/series/seen"
+            url = PDD_SERIES_SEEN
         )
     )
     itemlist.append(
@@ -166,7 +176,7 @@ def menuseries(item):
             channel = __channel__,
             action = "peliculas",
             title = u"Recomendadas",
-            url = "http://www.pordede.com/series/recommended"
+            url = PDD_SERIES_RECOMMENDED
         )
     )
     itemlist.append(
@@ -174,14 +184,14 @@ def menuseries(item):
             channel = __channel__,
             action = "search",
             title = u"Buscar...",
-            url = "http://www.pordede.com/series"
+            url = PDD_SERIES_SEARCH
         )
     )
 
     return itemlist
 
 def menupeliculas(item):
-    logger.info("pelisalacarta.channels.pordede menupeliculas")
+    logger.info("[pordede.py] menupeliculas")
 
     itemlist = []
     itemlist.append(
@@ -189,7 +199,7 @@ def menupeliculas(item):
             channel = __channel__,
             action = "peliculas",
             title = u"Novedades",
-            url = "http://www.pordede.com/pelis/loadmedia/offset/0/showlist/hot"
+            url = PDD_PELIS_NEWS
         )
     )
     itemlist.append(
@@ -197,7 +207,7 @@ def menupeliculas(item):
             channel = __channel__,
             action = "generos",
             title = u"Por géneros",
-            url = "http://www.pordede.com/pelis"
+            url = PDD_PELIS_GENRES
         )
     )
     itemlist.append(
@@ -205,7 +215,7 @@ def menupeliculas(item):
             channel = __channel__,
             action = "peliculas",
             title = u"Favoritas",
-            url = "http://www.pordede.com/pelis/favorite"
+            url = PDD_PELIS_FAVORITES
         )
     )
     itemlist.append(
@@ -213,7 +223,7 @@ def menupeliculas(item):
             channel = __channel__,
             action = "peliculas",
             title = u"Pendientes",
-            url = "http://www.pordede.com/pelis/pending"
+            url = PDD_PELIS_PENDING
         )
     )
     itemlist.append(
@@ -221,7 +231,7 @@ def menupeliculas(item):
             channel = __channel__,
             action = "peliculas",
             title = u"Vistas",
-            url = "http://www.pordede.com/pelis/seen"
+            url = PDD_PELIS_SEEN
         )
     )
     itemlist.append(
@@ -229,7 +239,7 @@ def menupeliculas(item):
             channel = __channel__,
             action = "peliculas",
             title = u"Recomendadas",
-            url = "http://www.pordede.com/pelis/recommended"
+            url = PDD_PELIS_RECOMMENDED
         )
     )
     itemlist.append(
@@ -237,14 +247,45 @@ def menupeliculas(item):
             channel = __channel__,
             action = "search",
             title = u"Buscar...",
-            url = "http://www.pordede.com/pelis"
+            url = PDD_PELIS_SEARCH
+        )
+    )
+
+    return itemlist
+
+def menulistas(item):
+    logger.info("[pordede.py] menulistas")
+
+    itemlist = []
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "listas_sigues",
+            title = u"Listas que sigues",
+            url = PDD_FOLLOWING_LISTS
+        )
+    )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "tus_listas",
+            title = u"Tus listas",
+            url = PDD_YOUR_LISTS
+        )
+    )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "listas_sigues",
+            title = u"Top listas",
+            url = PDD_TOP_LISTS
         )
     )
 
     return itemlist
 
 def generos(item):
-    logger.info("pelisalacarta.channels.pordede generos")
+    logger.info("[pordede.py] generos")
 
     # Descarga la pagina
     data = scrapertools.cache_page(item.url)
@@ -282,16 +323,16 @@ def generos(item):
     return itemlist
 
 def search(item,texto):
-    logger.info("pelisalacarta.channels.pordede search")
+    logger.info("[pordede.py] search")
 
-    if item.url=="":
-        item.url="http://www.pordede.com/pelis"
+    if item.url == "":
+        item.url = PDD_PELIS_SEARCH
 
     texto = texto.replace(" ","-")
 
     # Mete el referer en item.extra
     item.extra = item.url
-    item.url = item.url+"/search/query/"+texto+"/years/1950/on/undefined/showlist/all"
+    item.url = item.url + "/search/query/" + texto + "/years/1950/on/undefined/showlist/all"
     try:
         return buscar(item)
     # Se captura la excepción, para no interrumpir al buscador global si un canal falla
@@ -302,7 +343,7 @@ def search(item,texto):
         return []
 
 def buscar(item):
-    logger.info("pelisalacarta.channels.pordede buscar")
+    logger.info("[pordede.py] buscar")
 
     # Descarga la pagina
     headers = DEFAULT_HEADERS[:]
@@ -399,7 +440,7 @@ def parse_mixed_results(item,data):
     return itemlist
 
 def siguientes(item):
-    logger.info("pelisalacarta.channels.pordede siguientes")
+    logger.info("[pordede.py] siguientes")
 
     # Descarga la pagina
     headers = DEFAULT_HEADERS[:]
@@ -460,7 +501,7 @@ def siguientes(item):
     return itemlist
 
 def episodio(item):
-    logger.info("pelisalacarta.channels.pordede episodio")
+    logger.info("[pordede.py] episodio")
     itemlist = []
 
     # Descarga la pagina
@@ -511,7 +552,7 @@ def episodio(item):
     return itemlist2
 
 def peliculas(item):
-    logger.info("pelisalacarta.channels.pordede peliculas")
+    logger.info("[pordede.py] peliculas")
 
     # Descarga la pagina
     headers = DEFAULT_HEADERS[:]
@@ -528,7 +569,7 @@ def peliculas(item):
     return parse_mixed_results(item,data)
 
 def episodios(item):
-    logger.info("pelisalacarta.channels.pordede episodios")
+    logger.info("[pordede.py] episodios")
     itemlist = []
 
     # Descarga la pagina
@@ -597,7 +638,7 @@ def episodios(item):
     return itemlist
 
 def parse_listas(item, patron):
-    logger.info("pelisalacarta.channels.pordede parse_listas")
+    logger.info("[pordede.py] parse_listas")
 
     # Descarga la pagina
     headers = DEFAULT_HEADERS[:]
@@ -651,7 +692,7 @@ def parse_listas(item, patron):
     return itemlist
 
 def listas_sigues(item):
-    logger.info("pelisalacarta.channels.pordede listas_sigues")
+    logger.info("[pordede.py] listas_sigues")
 
     patron  = '<div class="clearfix modelContainer" data-model="lista"[^<]+'
     patron += '<span class="title"><span class="name"><a class="defaultLink" href="([^"]+)">([^<]+)</a>'
@@ -660,7 +701,7 @@ def listas_sigues(item):
     return parse_listas(item, patron)
 
 def tus_listas(item):
-    logger.info("pelisalacarta.channels.pordede tus_listas")
+    logger.info("[pordede.py] tus_listas")
 
     patron  = '<div class="clearfix modelContainer" data-model="lista"[^<]+'
     patron += '<div class="right"[^<]+'
@@ -673,7 +714,7 @@ def tus_listas(item):
     return parse_listas(item, patron)
 
 def lista(item):
-    logger.info("pelisalacarta.channels.pordede lista")
+    logger.info("[pordede.py] lista")
 
     # Descarga la pagina
     headers = DEFAULT_HEADERS[:]
@@ -690,7 +731,7 @@ def lista(item):
     return parse_mixed_results(item,data)
 
 def findvideos(item, verTodos=False):
-    logger.info("pelisalacarta.channels.pordede findvideos")
+    logger.info("[pordede.py] findvideos")
 
     # Descarga la pagina
     headers = DEFAULT_HEADERS[:]
@@ -788,7 +829,7 @@ def findvideos(item, verTodos=False):
                 'url': url,
                 'thumbnail': thumbnail,
                 'plot': plot,
-                'extra': sesion + "|" + item.url,
+                'extra': sesion + "|" + item.url + "|" + item.thumbnail,
                 'fulltitle': title,
                 'orden1': (jdown == ''),
                 'orden2': orden
@@ -802,7 +843,7 @@ def findvideos(item, verTodos=False):
                     url = url,
                     thumbnail = thumbnail,
                     plot = plot,
-                    extra = sesion + "|" + item.url,
+                    extra = sesion + "|" + item.url + "|" + item.thumbnail,
                     fulltitle = title
                 )
             )
@@ -845,7 +886,7 @@ def findallvideos(item):
     return findvideos(item, True)
 
 def play(item):
-    logger.info("pelisalacarta.channels.pordede play url="+item.url)
+    logger.info("[pordede.py] play url=" + item.url)
 
     # Marcar como visto
     checkseen(item.extra.split("|")[1])
@@ -864,7 +905,7 @@ def play(item):
     headers.append( ["Referer" , item.url ])
 
     #data2 = scrapertools.cache_page(url,headers=headers)
-    #logger.info("data2="+data2)
+    #if (DEBUG): logger.info("data2=" + data2)
     #url2 = scrapertools.find_single_match(data2,'<a href="([^"]+)"><button disabled>Ir al vídeo</button>')
     #url2 = urlparse.urljoin(item.url,url2)
     #headers = DEFAULT_HEADERS[:]
@@ -872,20 +913,20 @@ def play(item):
     #media_url = scrapertools.downloadpage(url2,headers=headers,header_to_get="location",follow_redirects=False)
 
     media_url = scrapertools.downloadpage(url,headers=headers,header_to_get="location",follow_redirects=False)
-    logger.info("media_url="+media_url)
+    if (DEBUG): logger.info("media_url=" + media_url)
 
     itemlist = servertools.find_video_items(data=media_url)
 
     for videoitem in itemlist:
         videoitem.title = item.title
         videoitem.fulltitle = item.fulltitle
-        videoitem.thumbnail = item.thumbnail
+        videoitem.thumbnail = item.extra.split("|")[2]
         videoitem.channel = __channel__
 
     return itemlist    
 
 def checkseen(item):
-    logger.info("pelisalacarta.channels.pordede checkseen "+item)
+    logger.info("[pordede.py] checkseen " + item)
 
     if "/viewepisode/" in item:
         headers = DEFAULT_HEADERS[:]
@@ -902,7 +943,7 @@ def checkseen(item):
     return True
 
 def infosinopsis(item):
-    logger.info("pelisalacarta.channels.pordede infosinopsis")
+    logger.info("[pordede.py] infosinopsis")
 
     url_aux = item.url.replace("/links/view/slug/", "/peli/").replace("/what/peli", "")
     # Descarga la pagina
