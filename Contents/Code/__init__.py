@@ -115,7 +115,7 @@ def channels_list():
                         caller_item_serialized = item.serialize()
                     ),
                     title = item.title,
-                    thumb = "http://pelisalacarta.mimediacenter.info/squares/" + item.channel + ".png"
+                    thumb = R(item.channel + "_thumb.png")#"http://pelisalacarta.mimediacenter.info/squares/" + item.channel + ".png"
                 )
             )
 
