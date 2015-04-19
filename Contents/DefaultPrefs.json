@@ -166,26 +166,6 @@
     "secure": "true"
   },
   {
-    "id": "zampaseriesaccount",
-    "label": "Cuenta zampaseries",
-    "type": "bool",
-    "default": "false"
-  },
-  {
-    "id": "zampaseriesuser",
-    "label": "Usuario",
-    "type": "text",
-    "default": ""
-  },
-  {
-    "id": "zampaseriespassword",
-    "label": "Password",
-    "type": "text",
-    "option": "hidden",
-    "default": "",
-    "secure": "true"
-  },
-  {
     "id": "playmaxaccount",
     "label": "Cuenta playmax",
     "type": "bool",
@@ -199,6 +179,46 @@
   },
   {
     "id": "playmaxpassword",
+    "label": "Password",
+    "type": "text",
+    "option": "hidden",
+    "default": "",
+    "secure": "true"
+  },
+  {
+    "id": "seriesmuaccount",
+    "label": "Cuenta seriesmu",
+    "type": "bool",
+    "default": "false"
+  },
+  {
+    "id": "seriesmuuser",
+    "label": "Usuario",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "id": "seriesmupassword",
+    "label": "Password",
+    "type": "text",
+    "option": "hidden",
+    "default": "",
+    "secure": "true"
+  },
+  {
+    "id": "torrentestrenosaccount",
+    "label": "Cuenta torrentestrenos",
+    "type": "bool",
+    "default": "false"
+  },
+  {
+    "id": "torrentestrenosuser",
+    "label": "Usuario",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "id": "torrentestrenospassword",
     "label": "Password",
     "type": "text",
     "option": "hidden",
