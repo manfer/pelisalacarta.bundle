@@ -66,16 +66,21 @@ def get_video_url( page_url , premium = False , user="" , password="", video_pas
 
         # Extrae la URL
         media_url = scrapertools.get_match( data , 'file\: "([^"]+)"' )
+        image_url = scrapertools.get_match( data , 'image\: "([^"]+)"' )
         
     video_urls = []
-    video_urls.append( [ scrapertools.get_filename_from_url(media_url)[-4:]+" [streamcloud]",media_url])
+    video_urls.append([
+        scrapertools.get_filename_from_url(media_url)[-4:] + " [streamcloud]",
+        media_url,
+        image_url
+    ])
 
     for video_url in video_urls:
         logger.info("[streamcloud.py] %s - %s" % (video_url[0],video_url[1]))
 
     return video_urls
 
-# Encuentra vídeos de este servidor en el texto pasado
+# Encuentra v?deos de este servidor en el texto pasado
 def find_videos(text):
     devuelve = []
 

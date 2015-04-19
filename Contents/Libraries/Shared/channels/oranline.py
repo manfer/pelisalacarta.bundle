@@ -48,9 +48,9 @@ def menupeliculas(item):
 def search(item,texto):
     logger.info("pelisalacarta.channels.oranline search")
     if item.url=="":
-        item.url="http://www.oranline.com/?s="
+        item.url="http://www.oranline.com/?s=%s"
     texto = texto.replace(" ","+")
-    item.url = item.url+texto
+    item.url = item.url % texto
     try:
         return peliculas(item)
     # Se captura la excepción, para no interrumpir al buscador global si un canal falla
@@ -127,6 +127,7 @@ def peliculas(item):
         if "v.png" in idiomas:
             title=title+"VOSE,"
         title = title[:-1]+")"
+        title = unicode( title, "utf-8" )
         url=urlparse.urljoin(item.url,scrapedurl)
         thumbnail=urlparse.urljoin(item.url,scrapedthumbnail)
         plot=scrapedplot.strip()
@@ -135,11 +136,11 @@ def peliculas(item):
 
     try:
         next_page = scrapertools.get_match(data,"<a href='([^']+)'>\&rsaquo\;</a>")
-        itemlist.append( Item(channel=__channel__, action="peliculas", title=">> Página siguiente" , url=urlparse.urljoin(item.url,next_page) , folder=True) )
+        itemlist.append( Item(channel=__channel__, action="peliculas", title=u"Página siguiente >>" , url=urlparse.urljoin(item.url,next_page) , folder=True) )
     except:
         try:
             next_page = scrapertools.get_match(data,"<span class='current'>\d+</span><a href='([^']+)'")
-            itemlist.append( Item(channel=__channel__, action="peliculas", title=">> Página siguiente" , url=urlparse.urljoin(item.url,next_page) , folder=True) )
+            itemlist.append( Item(channel=__channel__, action="peliculas", title=u"Página siguiente >>" , url=urlparse.urljoin(item.url,next_page) , folder=True) )
         except:
             pass
         pass
@@ -215,7 +216,7 @@ def idiomas(item):
     data = scrapertools.get_match(data,'<div class="widget"><h3>&Uacute;ltimos estrenos</h3>(.*?)</ul>')
 
     # Extrae las entradas
-    patron  = '<li class="cat-item cat-item-\d+"><a href="([^"]+)"[^>]+>([^<]+)</a>\s+\((\d+)\)'
+    patron  = '<li class="cat-item cat-item-\d+"><a href="([^"]+)"[^>]+>([^<]+)</a>\s+\((.*?)\)'
     matches = re.compile(patron,re.DOTALL).findall(data)
     scrapertools.printMatches(matches)
 
@@ -251,7 +252,7 @@ def test():
     # mainlist es "peliculas | documentales"
     mainlist_items = mainlist(Item())
 
-    # peliculas es "novedades | alfabetco | generos | idiomas"
+    # peliculas es "novedades | alfabetco | generos | idiomas"
     peliculas_items = peliculas(mainlist_items[0])
 
     # novedades es la lista de pelis

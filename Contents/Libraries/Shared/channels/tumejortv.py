@@ -1,4 +1,4 @@
-# -*- coding: iso-8859-1 -*-
+# -*- coding: utf-8 -*-
 #------------------------------------------------------------
 # pelisalacarta - XBMC Plugin
 # Canal para tumejortv
@@ -20,7 +20,7 @@ __language__ = "ES"
 
 DEBUG = config.get_setting("debug")
 
-BASE_URL = "http://www.tumejortv.com"
+BASE_URL = "http://www.tumejortv.com/"
 
 def isGeneric():
     return True
@@ -30,10 +30,42 @@ def mainlist(item):
     
     itemlist = []
 
-    itemlist.append( Item(channel=__channel__, action="submenu" , title="Peliculas"    , url=BASE_URL+"/directorio/peliculas", extra="peliculas"))
-    itemlist.append( Item(channel=__channel__, action="submenu" , title="Peliculas VO" , url=BASE_URL+"/directorio/peliculas_vo", extra="peliculas"))
-    itemlist.append( Item(channel=__channel__, action="submenu" , title="Series"       , url=BASE_URL+"/directorio/series", extra="series"))
-    itemlist.append( Item(channel=__channel__, action="submenu" , title="Series VO"    , url=BASE_URL+"/directorio/series_vo", extra="series"))
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "submenu",
+            title = u"Películas",
+            url = urlparse.urljoin( BASE_URL, "/directorio/peliculas/" ),
+            extra = "peliculas"
+        )
+    )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "submenu",
+            title = u"Películas VO",
+            url = urlparse.urljoin( BASE_URL, "/directorio/peliculas_vo/" ),
+            extra = "peliculas"
+        )
+    )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "submenu",
+            title = u"Series",
+            url = urlparse.urljoin( BASE_URL, "/directorio/series/" ),
+            extra = "series"
+        )
+    )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "submenu",
+            title = "Series VO",
+            url = urlparse.urljoin( BASE_URL, "/directorio/series_vo/" ),
+            extra = "series"
+        )
+    )
 
     return itemlist
 
@@ -71,9 +103,82 @@ def submenu(item):
     
     itemlist = []
 
-    itemlist.append( Item(channel=__channel__, action=item.extra        , title="Novedades"                  , url=item.url))
-    itemlist.append( Item(channel=__channel__, action="alfabetico" , title="Todas por orden alfabetico" , url=item.url, extra=item.extra))
-    itemlist.append( Item(channel=__channel__, action="search" , title="Buscar..." , url=item.url, extra=item.extra))
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = item.extra,
+            title = u"Novedades",
+            url = urlparse.urljoin ( item.url, "order/ultimos_actualizados" )
+        )
+    )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = item.extra,
+            title = u"Más Votadas",
+            url = urlparse.urljoin ( item.url, "order/mas_votados" )
+        )
+    )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = item.extra,
+            title = u"Más Vistas",
+            url = urlparse.urljoin ( item.url, "order/mas_visitados" )
+        )
+    )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = item.extra,
+            title = u"Todas",
+            url = urlparse.urljoin ( item.url, "pagina/1" )
+        )
+    )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "alfabetico",
+            title = u"Todas por orden alfabetico",
+            url = item.url, extra=item.extra
+        )
+    )
+    if item.extra == "peliculas":
+        itemlist.append(
+            Item(
+                channel = __channel__,
+                action = item.extra,
+                title = u"Estrenos DVD",
+                url = urlparse.urljoin ( item.url, "filtro/estrenos_dvd" )
+            )
+        )
+        itemlist.append(
+            Item(
+                channel = __channel__,
+                action = item.extra,
+                title = u"Estrenos Cine",
+                url = urlparse.urljoin ( item.url, "filtro/estrenos_cine" )
+            )
+        )
+    else:
+        itemlist.append(
+            Item(
+                channel = __channel__,
+                action = item.extra,
+                title = u"Estrenos Capítulos",
+                url = urlparse.urljoin ( item.url, "filtro/estrenos_capitulos" )
+            )
+        )
+
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "search",
+            title = "Buscar...",
+            url = item.url,
+            extra = item.extra
+        )
+    )
 
     return itemlist
 
@@ -82,10 +187,25 @@ def alfabetico(item):
     
     itemlist=[]
     alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    for letra in alfabeto:
-        itemlist.append( Item(channel=item.channel, action=item.extra, title=str(letra), url = item.url + "/filtro_letras/"+letra))
 
-    itemlist.append( Item(channel=item.channel, action=item.extra, title="0-9", url = item.url + "/filtro_letras/0"))
+    itemlist.append(
+        Item(
+            channel = item.channel,
+            action = item.extra,
+            title = "0-9",
+            url = urlparse.urljoin ( item.url, "pagina/1/filtro_letras/0" )
+        )
+    )
+
+    for letra in alfabeto:
+        itemlist.append(
+            Item(
+                channel = item.channel,
+                action = item.extra,
+                title = str(letra),
+                url = urlparse.urljoin ( item.url, "pagina/1/filtro_letras/" + letra )
+            )
+        )
 
     return itemlist
 
@@ -103,6 +223,7 @@ def peliculas(item):
 
     # Extrae las peliculas
     patron  = '<div class="antlo_dir_all_container">'
+    patron += '(?:<ul>.*?</ul>)?'
     patron += '<div rel="tag" data-href="([^"]+)".*?'
     patron += '<div class="antlo_dir_img_container"><a[^<]+<img src="([^"]+)"[^>]+></a>'
     patron += '<div class="antlo_pic_more_info"><span class="color1">([^>]+)<img src="[^"]+" alt="([^"]+)".*?</span></div></div><p>'
@@ -113,15 +234,24 @@ def peliculas(item):
 
     itemlist = []
     for url,thumbnail,tipo,idioma,titulo,categoria,calidad in matches:
-        scrapedtitle = titulo+" ("+idioma.strip()+") ("+calidad+")"
+        scrapedtitle = unicode( titulo+" ("+idioma.strip()+") ("+calidad+")", "utf-8" )
         scrapedurl = url+"enlaces/"
         scrapedthumbnail = thumbnail
         scrapedplot = ""
         if (DEBUG): logger.info("title=["+scrapedtitle+"], url=["+scrapedurl+"], thumbnail=["+scrapedthumbnail+"]")
 
-        itemlist.append( Item(channel=__channel__, action="findvideospeliculas" , title=scrapedtitle , fulltitle=scrapedtitle, url=scrapedurl, thumbnail=scrapedthumbnail, plot=scrapedplot))
+        itemlist.append(
+            Item(
+                channel = __channel__,
+                action = "findvideospeliculas",
+                title = scrapedtitle,
+                fulltitle = scrapedtitle,
+                url = scrapedurl,
+                thumbnail = scrapedthumbnail,
+                plot = scrapedplot
+            )
+        )
 
-    # Ordena los listados alfabeticos
     if "filtro_letras" in item.url:
         itemlist = sorted(itemlist, key=lambda Item: Item.title)    
 
@@ -129,13 +259,22 @@ def peliculas(item):
     patron = '<a href="([^"]+)">SIGUIENTE</a>'
     matches = re.compile(patron,re.DOTALL).findall(data)
     if len(matches)>0:
-        scrapedtitle = ">> Pagina siguiente"
+        scrapedtitle = u"Página siguiente >>"
         scrapedurl = matches[0]
         scrapedthumbnail = ""
         scrapedplot = ""
         if (DEBUG): logger.info("title=["+scrapedtitle+"], url=["+scrapedurl+"], thumbnail=["+scrapedthumbnail+"]")
 
-        itemlist.append( Item(channel=__channel__, action="peliculas" , title=scrapedtitle , url=scrapedurl, thumbnail=scrapedthumbnail, plot=scrapedplot))
+        itemlist.append(
+            Item(
+                channel = __channel__,
+                action = "peliculas",
+                title = scrapedtitle,
+                url = scrapedurl,
+                thumbnail = scrapedthumbnail,
+                plot = scrapedplot
+            )
+        )
 
     return itemlist
 
@@ -161,6 +300,7 @@ def series(item,extended=True):
     <h4 class="antlo_dir_video_cat">Temporada <span class="white">1</span> CapÃÂ­tulo <span class="white">10</span></h4><h5 class="antlo_dir_video_calidad">HDTV</h5></div></p></div></div>
     '''
     patron  = '<div class="antlo_dir_all_container">'
+    patron += '(?:<ul>.*?</ul>)?'
     patron += '<div rel="tag" data-href="([^"]+)".*?'
     patron += '<div class="antlo_dir_img_container"><a[^<]+<img src="([^"]+)"[^>]+></a>'
     patron += '<div class="antlo_pic_more_info"><span class="col[^"]+">([^>]+)<img src="[^"]+" alt="([^"]+)".*?</span></div></div><p>'
@@ -171,15 +311,26 @@ def series(item,extended=True):
 
     itemlist = []
     for url,thumbnail,tipo,idioma,titulo,categoria,calidad in matches:
-        scrapedtitle = titulo.strip()
+        scrapedtitle = unicode( titulo.strip(), "utf-8" )
         if extended:
-            scrapedtitle = scrapedtitle +" ("+idioma.strip()+") ("+scrapertools.htmlclean(calidad)+")"
+            scrapedtitle = unicode( scrapedtitle +" ("+idioma.strip()+") ("+scrapertools.htmlclean(calidad)+")", "utf-8" )
         scrapedurl = url+"capitulos/"
         scrapedthumbnail = thumbnail
         scrapedplot = ""
         if (DEBUG): logger.info("title=["+scrapedtitle+"], url=["+scrapedurl+"], thumbnail=["+scrapedthumbnail+"]")
 
-        itemlist.append( Item(channel=__channel__, action="findepisodios" , title=scrapedtitle , fulltitle=scrapedtitle, url=scrapedurl, thumbnail=scrapedthumbnail, plot=scrapedplot, show=titulo.strip()))
+        itemlist.append(
+            Item(
+                channel = __channel__,
+                action = "findepisodios",
+                title = scrapedtitle,
+                fulltitle = scrapedtitle,
+                url = scrapedurl,
+                thumbnail = scrapedthumbnail,
+                plot = scrapedplot,
+                show = unicode( titulo.strip(), "utf-8" )
+            )
+        )
 
     # Ordena los listados alfabeticos
     if "filtro_letras" in item.url:
@@ -189,7 +340,7 @@ def series(item,extended=True):
     patron = '<a href="([^"]+)">SIGUIENTE</a>'
     matches = re.compile(patron,re.DOTALL).findall(data)
     if len(matches)>0:
-        scrapedtitle = ">> Pagina siguiente"
+        scrapedtitle = u"Pagina siguiente >>"
         scrapedurl = matches[0]
         scrapedthumbnail = ""
         scrapedplot = ""
@@ -429,9 +580,9 @@ def play(item):
     from servers import servertools
     itemlist = servertools.find_video_items(data=item.url)
     for videoitem in itemlist:
-        videoitem.channel=__channel__
-        videoitem.action="play"
-        videoitem.folder=False
+        videoitem.channel = __channel__
+        videoitem.action = "play"
+        videoitem.folder = False
 
     return itemlist
 

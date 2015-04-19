@@ -39,6 +39,8 @@ def Start():
     HTTP.CacheTime = CACHE_1DAY
     HTTP.Headers['User-Agent'] = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:10.0.2) Gecko/20100101 Firefox/10.0.2"
 
+    Dict.Reset()
+
 ####################################################################################################
 @handler('/video/pelisalacarta', 'Pelisalacarta', art=ART_DEFAULT, thumb=ICON_DEFAULT)
 def mainlist():
@@ -60,11 +62,29 @@ def mainlist():
         else:
             oc.add(DirectoryObject(key=Callback(canal, channel_name=item.channel, action="mainlist"), title=item.title, thumb="http://pelisalacarta.mimediacenter.info/squares/"+item.channel+".png"))
     '''
-    oc.add(DirectoryObject(key=Callback(channels_list), title="Canales", thumb="http://pelisalacarta.mimediacenter.info/squares/channelselector.png"))
+    oc.add(
+        DirectoryObject(
+            key = Callback(channels_list),
+            title = u"Canales",
+            thumb = "http://pelisalacarta.mimediacenter.info/squares/channelselector.png"
+        )
+    )
     #oc.add(DirectoryObject(key=Callback(channels_list), title=Locale.LocalString("30033"), thumb="http://pelisalacarta.mimediacenter.info/squares/channelselector.png"))
-    oc.add(InputDirectoryObject(key = Callback(buscador_global), title = 'Buscador', prompt = 'Buscar...', thumb="http://pelisalacarta.mimediacenter.info/squares/buscador.png"))
+    oc.add(
+        InputDirectoryObject(
+            key = Callback(buscador_global),
+            title = u"Buscador",
+            prompt = u"Buscar...",
+            thumb = "http://pelisalacarta.mimediacenter.info/squares/buscador.png"
+        )
+    )
     #oc.add(InputDirectoryObject(key = Callback(trailers), title = 'Trailers', prompt = 'Buscar...', thumb="http://pelisalacarta.mimediacenter.info/squares/trailertools.png"))
-    oc.add(PrefsObject(title="Configuracion...",thumb="http://pelisalacarta.mimediacenter.info/squares/configuracion.png"))
+    oc.add(
+        PrefsObject(
+            title = u"Configuracion...",
+            thumb = "http://pelisalacarta.mimediacenter.info/squares/configuracion.png"
+        )
+    )
 
     return oc
 
@@ -86,7 +106,18 @@ def channels_list():
     for item in itemlist:
         Log.Info("item="+repr(item))
         if item.type=="generic" and item.channel not in ['tengourl','goear']:
-            oc.add(DirectoryObject(key=Callback(canal, channel_name=item.channel, action="mainlist"), title=item.title, thumb="http://pelisalacarta.mimediacenter.info/squares/"+item.channel+".png"))
+            oc.add(
+                DirectoryObject(
+                    key = Callback(
+                        canal,
+                        channel_name = item.channel,
+                        action = "mainlist",
+                        caller_item_serialized = item.serialize()
+                    ),
+                    title = item.title,
+                    thumb = R(item.channel + "_thumb.png")#"http://pelisalacarta.mimediacenter.info/squares/" + item.channel + ".png"
+                )
+            )
 
     return oc
 
@@ -100,7 +131,18 @@ def buscador_global(query=""):
 
     for item in itemlist:
         Log.Info("item="+repr(item))
-        oc.add(DirectoryObject(key=Callback(canal, channel_name=item.channel, action=item.action, caller_item_serialized=item.serialize()), title=item.title, thumb=item.thumbnail))
+        oc.add(
+            DirectoryObject(
+                key = Callback(
+                    canal,
+                    channel_name = item.channel,
+                    action = item.action,
+                    caller_item_serialized = item.serialize()
+                ),
+                title = item.title,
+                thumb = item.thumbnail
+            )
+        )
 
     #oc.add(DirectoryObject(key=Callback(channels_list), title=Locale.LocalString("30033"), thumb="http://pelisalacarta.mimediacenter.info/squares/channelselector.png"))
     return oc
@@ -109,7 +151,13 @@ def buscador_global(query=""):
 @route('/video/pelisalacarta/trailers')
 def trailers(query=""):
     oc = ObjectContainer(view_group="List")
-    oc.add(DirectoryObject(key=Callback(channels_list), title=Locale.LocalString("30033"), thumb="http://pelisalacarta.mimediacenter.info/squares/channelselector.png"))
+    oc.add(
+        DirectoryObject(
+            key = Callback(channels_list),
+            title = Locale.LocalString("30033"),
+            thumb = "http://pelisalacarta.mimediacenter.info/squares/channelselector.png"
+        )
+    )
     return oc
 
 ####################################################################################################
@@ -138,6 +186,7 @@ def canal(channel_name="",action="",caller_item_serialized=None):
         if hasattr(channelmodule, action):
             Log.Info("El módulo "+channel_name+" tiene una funcion "+action)
             itemlist = getattr(channelmodule, action)(caller_item)
+            oc.title2 = caller_item.title
 
             if action=="play" and len(itemlist)>0:
                 itemlist=play_video(itemlist[0])
@@ -164,7 +213,18 @@ def canal(channel_name="",action="",caller_item_serialized=None):
                 pass
             
             if action!="play":
-                oc.add(DirectoryObject(key=Callback(canal, channel_name=channel_name, action=item.action, caller_item_serialized=item.serialize()), title=item.title, thumb=item.thumbnail))
+                oc.add(
+                    DirectoryObject(
+                        key = Callback(
+                            canal,
+                            channel_name = channel_name,
+                            action = item.action,
+                            caller_item_serialized = item.serialize()
+                        ),
+                        title = item.title,
+                        thumb = item.thumbnail
+                    )
+                )
             
             else:
                 Log.Info("Llamando a la funcion play comun")
@@ -180,8 +240,16 @@ def canal(channel_name="",action="",caller_item_serialized=None):
                 Log.Info("videoClipObject="+str(mediaObject))
                 '''
 
-                videoClipObject = VideoClipObject(title=item.title,thumb=item.thumbnail, url="pelisalacarta://"+item.url )
+                videoClipObject = VideoClipObject(
+                    title = item.title,
+                    summary = item.plot,
+                    thumb = item.thumbnail,
+                    art = item.thumbnail,
+                    source_title = channel_name,
+                    url = "pelisalacarta://" + item.url
+                )
 
+                oc.art = item.art
                 oc.add(videoClipObject)
 
     except:
@@ -199,7 +267,18 @@ def play_video(item):
     video_urls = servertools.get_video_urls(item.server,item.url)
     itemlist = []
     for video_url in video_urls:
-        itemlist.append( Item(channel=item.channel, action="play" , title="Ver el video "+video_url[0] , url=video_url[1], thumbnail=item.thumbnail, plot=item.plot, server=""))
+        itemlist.append(
+            Item(
+                channel = item.channel,
+                action = "play",
+                title = item.title, #"Ver el video "+video_url[0],
+                url = video_url[1],
+                thumbnail = item.thumbnail,
+                art = video_url[2] if (len(video_url) == 3) else item.thumbnail,
+                plot = item.plot,
+                server = ""
+            )
+        )
 
     return itemlist
 

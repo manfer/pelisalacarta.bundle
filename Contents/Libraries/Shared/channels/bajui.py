@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #------------------------------------------------------------
 # pelisalacarta - XBMC Plugin
 # Canal para bajui
@@ -105,7 +105,7 @@ def peliculas(item,paginacion=True):
     itemlist = []
     
     for title,plot,url,thumbnail in matches:
-        scrapedtitle = title
+        scrapedtitle = unicode( title, "utf-8" )
         scrapedplot = clean_plot(plot)
         scrapedurl = urlparse.urljoin(item.url,url)
         scrapedthumbnail = urlparse.urljoin("http://www.bajui.com/",thumbnail.replace("_m.jpg","_g.jpg"))
@@ -121,7 +121,7 @@ def peliculas(item,paginacion=True):
 
     if len(matches)>0:
         scrapedurl = urlparse.urljoin("http://www.bajui.com/",matches[0])
-        pagitem = Item(channel=__channel__, action="peliculas", title=">> Página siguiente" , url=scrapedurl,fanart="http://pelisalacarta.mimediacenter.info/fanart/bajui.jpg")
+        pagitem = Item(channel=__channel__, action="peliculas", title=u"Página siguiente >>" , url=scrapedurl,fanart="http://pelisalacarta.mimediacenter.info/fanart/bajui.jpg")
         if not paginacion:
             itemlist.extend( peliculas(pagitem) )
         else:

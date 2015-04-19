@@ -18,6 +18,7 @@ from servers import servertools
 
 __channel__ = "beeg"
 DEBUG = config.get_setting("debug")
+BASE_URL = "http://beeg.com/"
 
 def isGeneric():
     return True
@@ -25,10 +26,60 @@ def isGeneric():
 def mainlist(item):
     logger.info("[beeg.py] mainlist")
     itemlist = []
-    itemlist.append( Item(channel=__channel__, action="videos"            , title="Útimos videos"       , url="http://beeg.com/"))
-    itemlist.append( Item(channel=__channel__, action="listcategorias"    , title="Listado categorias"  , url="http://beeg.com/"))
-    itemlist.append( Item(channel=__channel__, action="search"            , title="Buscar"              , url="http://beeg.com/search?q=" ))
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "videos",
+            title = u"Útimos Vídeos",
+            url = BASE_URL
+        )
+    )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "listcategorias",
+            title = u"Listado Tags Populares",
+            url = BASE_URL,
+            extra = "popular"
+        )
+    )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "listcategorias",
+            title = u"Listado Tags Completo",
+            url = BASE_URL,
+            extra = "all"
+        )
+    )
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "videos",
+            title = u"Vídeos Larga Duración",
+            url = urlparse.urljoin( BASE_URL, "/tag/long+videos" )
+        )
+    )
     return itemlist
+
+def search(item,texto):
+    logger.info("[beeg.py] search")
+    itemlist = []
+
+    texto = texto.replace( " ", "+" )
+    try:
+        item.url = urlparse.urljoin( BASE_URL, "/search?q=%s" )
+        item.url = item.url % texto
+        itemlist.extend(videos(item))
+
+        return itemlist
+
+    # Se captura la excepción, para no interrumpir al buscador global si un canal falla
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error( "%s" % line )
+        return []
 
 def videos(item):
     logger.info("[beeg.py] videos")
@@ -79,44 +130,101 @@ def videos(item):
         scrapedplot = ""
         # Depuracion
         if (DEBUG): logger.info("title=["+scrapedtitle+"], url=["+scrapedurl+"], thumbnail=["+scrapedthumbnail+"]")            
-        itemlist.append( Item(channel=__channel__, action="play" , title=scrapedtitle , url=scrapedurl, thumbnail=scrapedthumbnail, plot=scrapedplot, show=scrapedtitle, viewmode="movie", folder=False))
+        itemlist.append(
+            Item(
+                channel = __channel__,
+                action = "play",
+                title = scrapedtitle,
+                url = scrapedurl,
+                thumbnail = scrapedthumbnail,
+                plot = scrapedplot,
+                show = scrapedtitle,
+                viewmode = "movie",
+                folder = False
+            )
+        )
     
     return itemlist
 
 def listcategorias(item):
     logger.info("[beeg.py] listcategorias")
-    data = scrapertools.downloadpageGzip(item.url)
-    data = scrapertools.get_match(data,'<div class="block block-tags">(.*?)<!-- /TAGS -->')
-    patron = '<li><a target="_self" href="([^"]+)" >([^"]+)</a></li>'
-    matches = re.compile(patron,re.DOTALL).findall(data)
     itemlist = []
-    for url, categoria in matches:
-      url= "http://beeg.com" + url
-      itemlist.append( Item(channel=__channel__, action="videos" , title=categoria, url=url))
-      
-    return itemlist
-  
-def search(item,texto):
-    logger.info("[beeg.py] search")
-    texto = texto.replace(" ","+")
-    item.url = item.url+texto
-    try:
-        return videos(item)
-    # Se captura la excepción, para no interrumpir al buscador global si un canal falla
-    except:
-        import sys
-        for line in sys.exc_info():
-            logger.error( "%s" % line )
-        return []
 
+    data = scrapertools.downloadpageWithoutCookies(item.url)
+
+    # Tags Populares
+    patron_popular = '<div class="block block-tags-popular">(.*?)</ul>'
+    data_popular = scrapertools.find_single_match(data, patron_popular)
+    patron_tag = '<li><a target="_self" href="([^"]+)"\s?>(.*?)</a></li>'
+    matches = re.compile(patron_tag,re.DOTALL).findall(data_popular)
+
+    for scrapedurl, scrapedtag in matches:
+        itemlist.append(
+            Item(
+                channel = __channel__,
+                action = "videos",
+                title = unicode( scrapedtag, "utf-8" ),
+                url = urlparse.urljoin( BASE_URL, scrapedurl )
+            )
+        )
+
+    if item.extra == "popular":
+        return itemlist
+
+    patron_all = '<div class="block block-tags">(.*?)</ul>\s+</div>'
+    data_all = scrapertools.find_single_match(data, patron_all)
+    matches = re.compile(patron_tag,re.DOTALL).findall(data_all)
+
+    for scrapedurl, scrapedtag in matches:
+        itemlist.append(
+            Item(
+                channel = __channel__,
+                action = "videos",
+                title = unicode( scrapedtag, "utf-8" ),
+                url = urlparse.urljoin( BASE_URL, scrapedurl )
+            )
+        )
+
+    #sort tags
+    itemlist.sort(key=lambda item: item.title.lower().strip())
+    return itemlist
+    
 def play(item):
     logger.info("[beeg.py] play")
     itemlist = []
+
+    '''
+    headers=[]
+    headers.append( [ "User-Agent","Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:12.0) Gecko/20100101 Firefox/12.0" ] )
+    headers.append( [ "Referer","http://beeg.com/" ] )
+    headers.append( [ "Accept" , "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" ] )
+    headers.append( [ "Accept-Encoding" , "gzip, deflate" ] )
+    headers.append( [ "Accept-Language" , "es-es,es;q=0.8,en-us;q=0.5,en;q=0.3" ] )
+    headers.append( [ "Connection" , "keep-alive" ] )
+    headers.append( [ "Cookie" , "uniqid=xxxxxxxx; firsttime=1336260347; firsttimeref=direct; lasttime=1338080395; pageview=37;" ] )
+    '''
+    
     data = scrapertools.downloadpageGzip(item.url)
-    if DEBUG: logger.info(data)
+    logger.info("data="+data)
+
+    #'file': 'http://45.video.mystreamservice.com/480p/4014660.mp4',
+    #'file': 'http://02.007i.net/480p/4815411.mp4',
     patron = "'file'\: '([^']+)'"
-    url = scrapertools.get_match(data,patron)
-    itemlist.append( Item(channel=__channel__, action="play" , title=item.title , url=url, thumbnail=item.thumbnail, server="directo", folder=False))
+    url = scrapertools.get_match(data,patron)+"?start=0"
+    itemlist.append(
+        Item(
+            channel = __channel__,
+            action = "play",
+            title = item.title,
+            fulltitle = item.fulltitle,
+            url = url,
+            thumbnail = item.thumbnail,
+            plot = item.plot,
+            show = item.title,
+            server = "directo",
+            folder = False
+        )
+    )
 
     return itemlist
 

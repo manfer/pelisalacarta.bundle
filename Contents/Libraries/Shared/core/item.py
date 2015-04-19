@@ -4,6 +4,7 @@ class Item(object):
     url = ""
     page = ""
     thumbnail = ""
+    art = ""
     plot = ""
     duration = ""
     fanart = ""
@@ -24,7 +25,7 @@ class Item(object):
     fulltitle = ""
     viewmode = "list"
 
-    def __init__(self, channel="", title="", url="", page="", thumbnail="", plot="", duration="", fanart="", action="", server="directo", extra="", show="", category = "" , language = "" , subtitle="" , folder=True, context = "",totalItems = 0, overlay = None, type="", password="", fulltitle="", viewmode="list" ):
+    def __init__(self, channel="", title="", url="", page="", thumbnail="", art="", plot="", duration="", fanart="", action="", server="directo", extra="", show="", category = "" , language = "" , subtitle="" , folder=True, context = "",totalItems = 0, overlay = None, type="", password="", fulltitle="", viewmode="list" ):
         self.channel = channel
         self.title = title
         self.url = url
@@ -33,6 +34,7 @@ class Item(object):
         else:
             self.page = page
         self.thumbnail = thumbnail
+        self.art = art
         self.plot = plot
         self.duration = duration
         self.fanart = fanart
@@ -68,6 +70,8 @@ class Item(object):
         devuelve = devuelve + self.category + separator
         devuelve = devuelve + self.fulltitle + separator
         devuelve = devuelve + self.viewmode + separator
+        devuelve = devuelve + self.thumbnail + separator
+        devuelve = devuelve + self.art + separator
         return devuelve
     
     def deserialize(self,cadena):
@@ -81,6 +85,8 @@ class Item(object):
         self.category = trozos[6]
         self.fulltitle = trozos[7]
         self.viewmode = trozos[8]
+        self.thumbnail = trozos[9]
+        self.art = trozos[10]
 
 if __name__ == "__main__":
     item = Item(title="bla b", url="http://bla")

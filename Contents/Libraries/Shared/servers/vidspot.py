@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #------------------------------------------------------------
 # pelisalacarta - XBMC Plugin
 # Conector para vidspot
@@ -50,11 +50,16 @@ def get_video_url( page_url , premium = False , user="" , password="", video_pas
         if media_url == "":
             media_url = match[0]
 
+    image_url = scrapertools.get_match( data , '<img\s+class="fillcont"\s+src="([^"]+)">' )
     video_urls = []
 
     if media_url!="":
         media_url+= "&direct=false"
-        video_urls.append( [ scrapertools.get_filename_from_url(media_url)[-4:]+" [vidspot]",media_url])
+        video_urls.append([
+            scrapertools.get_filename_from_url(media_url)[-4:] + " [vidspot]",
+            media_url,
+            image_url
+        ])
 
     for video_url in video_urls:
         logger.info("[vidspot.py] %s - %s" % (video_url[0],video_url[1]))

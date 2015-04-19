@@ -36,7 +36,7 @@ def searchresults(params,url="",category=""):
         tecleado = url
     tecleado = tecleado.replace(" ", "+")
     
-    # Lanza las búsquedas
+    # Lanza las b?squedas
     matches = []
     itemlist = do_search_results(tecleado)
     for item in itemlist:
@@ -57,32 +57,52 @@ def searchresults(params,url="",category=""):
 
 def do_search_results(tecleado):
 
+    patron = '(([^"]+)\sserver:([^"]+))|([^"]+)'
+    matches = re.compile(patron,re.DOTALL).findall(tecleado)
+
+    server = matches[0][2]
+
+    if server != "":
+        tecleado = matches[0][1]
+
     itemlist = []
 
     #from pelisalacarta.channels import animeflv
     #itemlist.extend( animeflv.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import animeid
-    itemlist.extend( animeid.search( Item() , tecleado) )
+    if server == "" or server == "animeid":
+        from channels import animeid
+        itemlist.extend( animeid.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import bajui
-    itemlist.extend( bajui.search( Item() , tecleado) )
+    if server == "" or server == "bajui":
+        from channels import bajui
+        itemlist.extend( bajui.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import filmpertutti
-    itemlist.extend( filmpertutti.search( Item() , tecleado) )
+    if config.get_setting("enableadultmode")=="true" and (server == "" or server == "beeg"):
+        from channels import beeg
+        itemlist.extend( beeg.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import filmsenzalimiti
-    itemlist.extend( filmsenzalimiti.search( Item() , tecleado) )
+    if server == "" or server == "cinehanwer":
+        from channels import cinehanwer
+        itemlist.extend( cinehanwer.search( Item() , tecleado) )
+
+    if server == "" or server == "filmpertutti":
+        from channels import filmpertutti
+        itemlist.extend( filmpertutti.search( Item() , tecleado) )
+
+    if server == "" or server == "filmsenalimiti":
+        from channels import filmsenzalimiti
+        itemlist.extend( filmsenzalimiti.search( Item() , tecleado) )
 
     #from pelisalacarta.channels import cineblog01
     #itemlist.extend( cineblog01.search( Item() , tecleado) )
     #itemlist.extend( cineblog01.searchserie( Item() , tecleado) )
 
-    from pelisalacarta.channels import cinetube
-    itemlist.extend( cinetube.search( Item() , tecleado, "F") )
+    #from channels import cinetube
+    #itemlist.extend( cinetube.search( Item() , tecleado, "F") )
 
-    from pelisalacarta.channels import cineonlineeu
-    itemlist.extend( cineonlineeu.search( Item() , tecleado) )
+    #from channels import cineonlineeu
+    #itemlist.extend( cineonlineeu.search( Item() , tecleado) )
 
     #from pelisalacarta.channels import cuevana
     #itemlist.extend( cuevana.search( Item() , tecleado) )
@@ -96,20 +116,23 @@ def do_search_results(tecleado):
     #from pelisalacarta.channels import cuevana
     #itemlist.extend( cuevana.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import divxatope
-    itemlist.extend( divxatope.search( Item() , tecleado) )
+    if server == "" or server == "divxatope":
+        from channels import divxatope
+        itemlist.extend( divxatope.search( Item() , tecleado) )
 
     #from pelisalacarta.channels import divxonline
     #itemlist.extend( divxonline.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import documaniatv
-    itemlist.extend( documaniatv.search( Item() , tecleado) )
+    if server == "" or server == "documaniatv":
+        from channels import documaniatv
+        itemlist.extend( documaniatv.search( Item() , tecleado) )
 
     #from pelisalacarta.channels import gnula
     #itemlist.extend( gnula.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import jkanime
-    itemlist.extend( jkanime.search( Item() , tecleado) )
+    if server == "" or server == "jkanime":
+        from channels import jkanime
+        itemlist.extend( jkanime.search( Item() , tecleado) )
 
     #from pelisalacarta.channels import newdivx
     #itemlist.extend( newdivx.search( Item() , tecleado) )
@@ -117,38 +140,66 @@ def do_search_results(tecleado):
     #from pelisalacarta.channels import newhd
     #itemlist.extend( newhd.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import peliculasaudiolatino
-    itemlist.extend( peliculasaudiolatino.search( Item() , tecleado) )
+    if server == "" or server == "oranline":
+        from channels import oranline
+        itemlist.extend( oranline.search( Item() , tecleado) )
+
+    if server == "" or server == "peliculasaudiolatino":
+        from channels import peliculasaudiolatino
+        itemlist.extend( peliculasaudiolatino.search( Item() , tecleado) )
 
     #from pelisalacarta.channels import peliculasflv
     #itemlist.extend( peliculasflv.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import peliculasyonkis_generico
-    itemlist.extend( peliculasyonkis_generico.search( Item() , tecleado) )
+    #from channels import peliculasyonkis_generico
+    #itemlist.extend( peliculasyonkis_generico.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import seriesyonkis
-    itemlist.extend( seriesyonkis.search( Item() , tecleado) )
+    if server == "" or server == "pelisadicto":
+        from channels import pelisadicto
+        itemlist.extend( pelisadicto.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import serieonline
-    itemlist.extend( serieonline.search( Item() , tecleado) )
+    if config.get_setting("pordedeaccount")=="true" and (server == "" or server == "pordede"):
+        from channels import pordede
+        itemlist.extend( pordede.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import shurweb
-    itemlist.extend( shurweb.search( Item() , tecleado) )
+    if config.get_setting("enableadultmode")=="true" and (server == "" or server == "pornhub"):
+        from channels import pornhub
+        itemlist.extend( pornhub.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import tumejortv
-    itemlist.extend( tumejortv.search( Item() , tecleado) )
+    #from channels import seriesyonkis
+    #itemlist.extend( seriesyonkis.search( Item() , tecleado) )
 
-    if config.get_setting("serieslyaccount")=="true":
-        from pelisalacarta.channels import seriesly
+    if server == "" or server == "serieonline":
+        from channels import serieonline
+        itemlist.extend( serieonline.search( Item() , tecleado) )
+
+    if server == "" or server == "shurweb":
+        from channels import shurweb
+        itemlist.extend( shurweb.search( Item() , tecleado) )
+
+    if server == "" or server == "tumejortv":
+        from channels import tumejortv
+        itemlist.extend( tumejortv.search( Item() , tecleado) )
+
+    if config.get_setting("serieslyaccount")=="true" and (server == "" or server == "seriesly"):
+        from channels import seriesly
         itemlist.extend( seriesly.search( Item() , tecleado) )
 
     #from pelisalacarta.channels import seriesdanko
     #itemlist.extend( seriesdanko.search( Item() , tecleado) )
+    if config.get_setting("enableadultmode")=="true" and (server == "" or server == "tupornotv"):
+        from channels import tupornotv
+        itemlist.extend( tupornotv.search( Item() , tecleado) )
 
-    from pelisalacarta.channels import veranime
-    itemlist.extend( veranime.search( Item() , tecleado) )
+    if server == "" or server == "veranime":
+        from channels import veranime
+        itemlist.extend( veranime.search( Item() , tecleado) )
 
-    itemlist.sort(key=lambda item: item.title.lower().strip())
+    if config.get_setting("enableadultmode")=="true" and (server == "" or server == "xhamster"):
+        from channels import xhamster
+        itemlist.extend( xhamster.search( Item() , tecleado) )
+
+    #itemlist.sort(key=lambda item: item.title.lower().strip())
     return itemlist
 
 def salvar_busquedas(params,url="",category=""):
@@ -325,7 +376,7 @@ def por_teclado(params,url="",category=""):
             return
         if params.plot:
             channel = params.plot
-            exec "import pelisalacarta.channels."+channel+" as plugin"
+            exec "import channels."+channel+" as plugin"
         else:
             exec "import pelisalacarta."+channel+" as plugin"
 
@@ -340,7 +391,7 @@ def por_teclado(params,url="",category=""):
             return
         if params.get("plot"):
             channel = params.get("plot")
-            exec "import pelisalacarta.channels."+channel+" as plugin"
+            exec "import channels."+channel+" as plugin"
         else:
             exec "import pelisalacarta."+channel+" as plugin"
 
