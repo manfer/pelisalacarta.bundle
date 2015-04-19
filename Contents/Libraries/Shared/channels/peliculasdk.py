@@ -32,19 +32,14 @@ def mainlist(item):
     logger.info("pelisalacarta.peliculasdk mainlist")
     itemlist = []
     title ="Estrenos"
-    title = title.replace(title,"[COLOR orange]"+title+"[/COLOR]")
     itemlist.append( Item(channel=__channel__, title=title      , action="peliculas", url="http://www.peliculasdk.com/ver/estrenos", fanart="http://s24.postimg.org/z6ulldcph/pdkesfan.jpg", thumbnail="http://s16.postimg.org/st4x601d1/pdkesth.jpg"))
     title ="PelisHd"
-    title = title.replace(title,"[COLOR orange]"+title+"[/COLOR]")
     itemlist.append( Item(channel=__channel__, title=title     , action="peliculas", url="http://www.peliculasdk.com/calidad/HD-720/", fanart="http://s18.postimg.org/wzqonq3w9/pdkhdfan.jpg", thumbnail="http://s8.postimg.org/nn5669ln9/pdkhdthu.jpg"))
     title ="Pelis HD-Rip"
-    title = title.replace(title,"[COLOR orange]"+title+"[/COLOR]")
     itemlist.append( Item(channel=__channel__, title=title      , action="peliculas", url="http://www.peliculasdk.com/calidad/HD-320", fanart="http://s7.postimg.org/3pmnrnu7f/pdkripfan.jpg", thumbnail="http://s12.postimg.org/r7re8fie5/pdkhdripthub.jpg"))
     title ="Pelis Audio español"
-    title = title.replace(title,"[COLOR orange]"+title+"[/COLOR]")
     itemlist.append( Item(channel=__channel__, title=title     , action="peliculas", url="http://www.peliculasdk.com/idioma/Espanol/", fanart="http://s11.postimg.org/65t7bxlzn/pdkespfan.jpg", thumbnail="http://s13.postimg.org/sh1034ign/pdkhsphtub.jpg"))
     title ="Buscar..."
-    title = title.replace(title,"[COLOR orange]"+title+"[/COLOR]")
     itemlist.append( Item(channel=__channel__, title=title      , action="search", url="http://www.peliculasdk.com/calidad/HD-720/", fanart="http://s14.postimg.org/ceqajaw2p/pdkbusfan.jpg", thumbnail="http://s13.postimg.org/o85gsftyv/pdkbusthub.jpg"))
     
 
@@ -85,13 +80,10 @@ def buscador(item):
     matches = re.compile(patron,re.DOTALL).findall(data)
     scrapertools.printMatches(matches)
     if len(matches)==0 :
-        itemlist.append( Item(channel=__channel__, title="[COLOR gold][B]Sin resultados...[/B][/COLOR]", thumbnail ="http://s6.postimg.org/t8gfes7rl/pdknoisethumb.png", fanart ="http://s6.postimg.org/oy1rj72oh/pdknoisefan.jpg",folder=False) )
+        itemlist.append( Item(channel=__channel__, title="Sin resultados...", thumbnail ="http://s6.postimg.org/t8gfes7rl/pdknoisethumb.png", fanart ="http://s6.postimg.org/oy1rj72oh/pdknoisefan.jpg",folder=False) )
 
     for scrapedurl, scrapedtitle, scrapedthumbnail, scrapedlenguaje, scrapedcalidad in matches:
-        scrapedcalidad = scrapedcalidad.replace(scrapedcalidad,"[COLOR orange]"+scrapedcalidad+"[/COLOR]")
-        scrapedlenguaje = scrapedlenguaje.replace(scrapedlenguaje,"[COLOR orange]"+scrapedlenguaje+"[/COLOR]")
         scrapedtitle = scrapedtitle + "-(Idioma: " + scrapedlenguaje + ")" + "-(Calidad: " + scrapedcalidad +")"
-        scrapedtitle = scrapedtitle.replace(scrapedtitle,"[COLOR white]"+scrapedtitle+"[/COLOR]")
         itemlist.append( Item(channel=__channel__, title =scrapedtitle , url=scrapedurl, action="fanart", thumbnail=scrapedthumbnail, fanart="http://s18.postimg.org/h9kb22mnt/pdkfanart.jpg", folder=True) )
 
     return itemlist
@@ -122,10 +114,7 @@ def peliculas(item):
 
 
     for scrapedurl, scrapedtitle, scrapedthumbnail, scrapedlenguaje, scrapedcalidad in matches:
-        scrapedcalidad = scrapedcalidad.replace(scrapedcalidad,"[COLOR orange]"+scrapedcalidad+"[/COLOR]")
-        scrapedlenguaje = scrapedlenguaje.replace(scrapedlenguaje,"[COLOR orange]"+scrapedlenguaje+"[/COLOR]")
         scrapedtitle = scrapedtitle + "-(Idioma: " + scrapedlenguaje + ")" + "-(Calidad: " + scrapedcalidad +")"
-        scrapedtitle = scrapedtitle.replace(scrapedtitle,"[COLOR white]"+scrapedtitle+"[/COLOR]")
         itemlist.append( Item(channel=__channel__, title =scrapedtitle , url=scrapedurl, action="fanart", thumbnail=scrapedthumbnail, fanart="http://s18.postimg.org/h9kb22mnt/pdkfanart.jpg", folder=True) )
     ## Paginación
     patronvideos  = '<a href="([^"]+)" >Siguiente &raquo;</a></div>'
@@ -134,7 +123,6 @@ def peliculas(item):
     if len(matches)>0:
         scrapedurl = urlparse.urljoin(item.url,matches[0])
         title ="siguiente>>"
-        title = title.replace(title,"[COLOR red]"+title+"[/COLOR]")
         itemlist.append( Item(channel=__channel__, action="peliculas", title=title , url=scrapedurl , thumbnail="http://s6.postimg.org/uej03x4r5/bricoflecha.png", fanart="http://s18.postimg.org/h9kb22mnt/pdkfanart.jpg",  folder=True) )
     
 
@@ -163,7 +151,6 @@ def fanart(item):
             item.extra= fanart
     itemlist.append( Item(channel=__channel__, title =item.title , url=item.url, action="findvideos", thumbnail=item.thumbnail, fanart=item.extra, folder=True) )
     title ="Info"
-    title = title.replace(title,"[COLOR skyblue]"+title+"[/COLOR]")
     itemlist.append( Item(channel=__channel__, action="info" , title=title , url=item.url, thumbnail=item.thumbnail, fanart=item.extra, folder=False ))
 
 
@@ -196,23 +183,18 @@ def findvideos(item):
     for server, url in matches:
         scrapedplot = scrapertools.get_match(data,'<span class="clms">(.*?)</div></div>')
         plotformat = re.compile('(.*?:) </span>',re.DOTALL).findall(scrapedplot)
-        scrapedplot = scrapedplot.replace(scrapedplot,"[COLOR white]"+scrapedplot+"[/COLOR]")
         
-        for plot in plotformat:
-            scrapedplot = scrapedplot.replace(plot,"[COLOR red][B]"+plot+"[/B][/COLOR]")
-        scrapedplot = scrapedplot.replace("</span>","[CR]")
         scrapedplot = scrapedplot.replace(":","")
 
         if server in servers_data_list:
             video_url = re.sub(r"embed\-|\-630x400\.html","",url)
             video_url = video_url.replace("'+codigo+'",servers_data_list[server])
             servertitle = scrapertools.get_match(video_url,'http://(.*?)/')
-            servertitle = servertitle.replace(servertitle,"[COLOR red]"+servertitle+"[/COLOR]")
             servertitle = servertitle.replace("embed.","")
             servertitle = servertitle.replace("player.","")
             servertitle = servertitle.replace("api.video.","")
             servertitle = servertitle.replace("hqq.tv","netu.tv")
-            title = "[COLOR orange]Ver en --[/COLOR]" + servertitle
+            title = "Ver en --" + servertitle
             itemlist.append( Item(channel=__channel__, title =title , url=video_url, action="play", thumbnail=item.thumbnail, plot=scrapedplot, fanart=item.fanart ) )
 
     return itemlist
@@ -248,13 +230,9 @@ def info(item):
     data = scrapertools.cachePage(url)
     data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;","",data)
     title= scrapertools.get_match(data,'<div id="titleopcions">Ver película(.*?)\(')
-    title = title.replace(title,"[COLOR aqua][B]"+title+"[/B][/COLOR]")
     plot = scrapertools.get_match(data,'<span class="clms">(.*?)</div></div>')
     plotformat = re.compile('(.*?:) </span>',re.DOTALL).findall(plot)
-    plot = plot.replace(plot,"[COLOR white]"+plot+"[/COLOR]")
-    for info in plotformat:
-        plot = plot.replace(info,"[COLOR red][B]"+info+"[/B][/COLOR]")
-    plot = plot.replace("</span>","[CR]")
+    plot = plot.replace("</span>","\n")
     plot = plot.replace(":","")
     fanart="http://s11.postimg.org/qu66qpjz7/zentorrentsfanart.jpg"
     tbd = TextBox("DialogTextViewer.xml", os.getcwd(), "Default")

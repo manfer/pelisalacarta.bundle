@@ -39,13 +39,13 @@ def mainlist(item):
     
     
     
-    title="[COLOR white][B]Peliculas[/B][/COLOR]"
+    title="Peliculas"
     itemlist.append( Item(channel=__channel__, title=title , action="peliculas"           , url="http://www.txibitsoft.com/torrents.php?procesar=1&categorias='Peliculas'&pagina=1", thumbnail="http://s27.postimg.org/nbbeles4j/tbpelithu.jpg", fanart="http://s14.postimg.org/743jqty35/tbpelifan.jpg"))
-    title="[COLOR white][B]1080[/B][/COLOR]"
+    title="1080"
     itemlist.append( Item(channel=__channel__, title=title , action="peliculas"           , url="http://www.txibitsoft.com/torrents.php?procesar=1&categorias='Cine%20Alta%20Definicion%20HD'&subcategoria=1080p&pagina=1", thumbnail="http://s4.postimg.org/t4i9vgjgd/tb1080th.jpg", fanart="http://s17.postimg.org/7z5pnf5tb/tb1080fan.jpg"))
-    title="[COLOR white][B]Series[/B][/COLOR]"
+    title="Series"
     itemlist.append( Item(channel=__channel__, title=title , action="peliculas"           , url="http://www.txibitsoft.com/torrents.php?procesar=1&categorias='Series'&pagina=1", thumbnail="http://s12.postimg.org/4ao5ekygd/tbseriethu.jpg", fanart="http://s12.postimg.org/oymstbjot/tbseriefan.jpg"))
-    title="[COLOR white][B]Buscar...[/B][/COLOR]"
+    title="Buscar..."
     itemlist.append( Item(channel=__channel__, title=title      , action="search", url="", fanart="http://s1.postimg.org/f5mnv2pcf/tbbusfan.jpg", thumbnail="http://s28.postimg.org/r2911z0rx/tbbusthu.png"))
     return itemlist
 
@@ -87,15 +87,12 @@ def buscador(item):
     matches = re.compile(patron,re.DOTALL).findall(data)
     scrapertools.printMatches(matches)
     if len(matches)==0 :
-       itemlist.append( Item(channel=__channel__, title="[COLOR gold][B]No se ha encontrado nada en la busqueda...[/B][/COLOR]", thumbnail ="http://s6.postimg.org/vhczf38ep/oops.png", fanart ="http://pop-verse.com/wp-content/uploads/2014/11/000494946_prevstill.jpeg",folder=False) )
+       itemlist.append( Item(channel=__channel__, title="No se ha encontrado nada en la busqueda...", thumbnail ="http://s6.postimg.org/vhczf38ep/oops.png", fanart ="http://pop-verse.com/wp-content/uploads/2014/11/000494946_prevstill.jpeg",folder=False) )
 
 
     
     for scrapedurl, scrapedtitle, scrapedthumbnail, scrapedlenguage, scrapedsize in matches:
         scrapedurl = "http://www.txibitsoft.com" + scrapedurl
-        scrapedlenguage = scrapedlenguage.replace(scrapedlenguage,"[COLOR blue]"+scrapedlenguage+"[/COLOR]")
-        scrapedsize = scrapedsize.replace(scrapedsize,"[COLOR gold]"+scrapedsize+"[/COLOR]")
-        scrapedtitle = scrapedtitle.replace(scrapedtitle,"[COLOR white]"+scrapedtitle+"[/COLOR]")
         scrapedtitle = scrapedtitle + "-(Idioma:" + scrapedlenguage + ")" + "-(Tamaño: " + scrapedsize +")"
         
         
@@ -129,9 +126,6 @@ def peliculas(item):
     
     for scrapedurl, scrapedtitle, scrapedthumbnail, scrapedlenguage, scrapedsize in matches:
         scrapedurl = "http://www.txibitsoft.com" + scrapedurl
-        scrapedlenguage = scrapedlenguage.replace(scrapedlenguage,"[COLOR blue]"+scrapedlenguage+"[/COLOR]")
-        scrapedsize = scrapedsize.replace(scrapedsize,"[COLOR gold]"+scrapedsize+"[/COLOR]")
-        scrapedtitle = scrapedtitle.replace(scrapedtitle,"[COLOR white]"+scrapedtitle+"[/COLOR]")
         scrapedtitle = scrapedtitle + "-(Idioma:" + scrapedlenguage + ")" + "-(Tamaño: " + scrapedsize +")"
         
         
@@ -156,7 +150,6 @@ def peliculas(item):
         
 
     title ="siguiente>>"
-    title = title.replace(title,"[COLOR orange]"+title+"[/COLOR]")
     itemlist.append( Item(channel=__channel__, action="peliculas", title=title , url=next_page , thumbnail="http://s18.postimg.org/4l9172cqx/tbsiguiente.png", fanart="http://s21.postimg.org/w0lgvyud3/tbfanartgeneral2.jpg" , folder=True) )
     
     
@@ -238,7 +231,6 @@ def fanart(item):
                        itemlist.append( Item(channel=__channel__, title=item.title, url=item.url, action="findvideos", thumbnail=item.thumbnail, fanart=item.extra,folder=True) )
 
     title ="Info"
-    title = title.replace(title,"[COLOR skyblue][B]"+title+"[/B][/COLOR]")
     if len(item.extra)==0:
         fanart=item.thumbnail
     if len(item.extra)>0:
@@ -266,8 +258,7 @@ def findvideos(item):
         scrapedurl = "http://www.txibitsoft.com" + scrapedurl
         
         
-        title_tag="[COLOR orange]Ver--[/COLOR]"
-        scrapedtitle = scrapedtitle.replace(scrapedtitle,"[COLOR magenta][B]"+scrapedtitle+"[/B][/COLOR]")
+        title_tag="Ver--"
         scrapedtitle = title_tag + scrapedtitle
         itemlist.append( Item(channel=__channel__, title=scrapedtitle, url=scrapedurl, action="play", server="torrent", thumbnail=item.thumbnail, fanart=item.fanart,folder=False) )
       
@@ -279,7 +270,6 @@ def info(item):
     data = scrapertools.cachePage(url)
     data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;","",data)
     title= title= scrapertools.get_match(data,'</script><title>([^<]+)</title>')
-    title = title.replace(title,"[COLOR aqua][B]"+title+"[/B][/COLOR]")
     scrapedplot = scrapertools.get_match(data,'<textarea.*?">(.*?)</textarea></li>')
     if "Sinopsis" in scrapedplot:
         scrapedplot= scrapertools.get_match(data,'<textarea.*Sinopsis(.*?)</textarea></li>')
@@ -289,10 +279,8 @@ def info(item):
         scrapedplot= scrapertools.get_match(data,'<textarea.*Sinópsis(.*?)</textarea></li>')
     if "REPARTO" in scrapedplot:
         scrapedplot= scrapertools.get_match(data,'<textarea.*REPARTO(.*?)</textarea></li>')
-    plot_title = "Sinopsis" + "[CR]"
-    plot_title = plot_title.replace(plot_title,"[COLOR blue][B]"+plot_title+"[/B][/COLOR]")
+    plot_title = "Sinopsis: "
     scrapedplot = plot_title + scrapedplot
-    scrapedplot = scrapedplot.replace(scrapedplot,"[COLOR magenta]"+scrapedplot+"[/COLOR]")
     scrapedplot = scrapedplot.replace(":","")
     scrapedplot = scrapedplot.replace("&aacute;","a")
     scrapedplot = scrapedplot.replace("&iacute;","i")

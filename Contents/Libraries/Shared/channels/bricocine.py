@@ -71,11 +71,9 @@ def peliculas(item):
     matches = re.compile(patron,re.DOTALL).findall(data)
     scrapertools.printMatches(matches)
     if len(matches)==0 :
-        itemlist.append( Item(channel=__channel__, title="[COLOR gold][B]No hay resultados...[/B][/COLOR]", thumbnail ="http://s6.postimg.org/fay99h9ox/briconoisethumb.png", fanart ="http://s6.postimg.org/uie8tu1jl/briconoisefan.jpg",folder=False) )
+        itemlist.append( Item(channel=__channel__, title="No hay resultados...", thumbnail ="http://s6.postimg.org/fay99h9ox/briconoisethumb.png", fanart ="http://s6.postimg.org/uie8tu1jl/briconoisefan.jpg",folder=False) )
 
     for scrapedurl, scrapedthumbnail, scrapedtitle, scrapedcreatedate in matches:
-        scrapedcreatedate = scrapedcreatedate.replace(scrapedcreatedate,"[COLOR sandybrown][B]"+scrapedcreatedate+"[/B][/COLOR]")
-        scrapedtitle = scrapedtitle.replace(scrapedtitle,"[COLOR white]"+scrapedtitle+"[/COLOR]")
         scrapedtitle = scrapedtitle + "(Puntuación:" + scrapedcreatedate + ")"
        
         itemlist.append( Item(channel=__channel__, title=scrapedtitle, url=scrapedurl, action="fanart", thumbnail=scrapedthumbnail, fanart="http://s15.postimg.org/id6ec47vf/bricocinefondo.jpg", folder=True) )
@@ -87,7 +85,7 @@ def peliculas(item):
     # Si falla no muestra ">> Página siguiente"
     try:
         next_page = scrapertools.get_match(data,"<span class='current'>\d+</span><a href='([^']+)'")
-        title= "[COLOR red]Pagina siguiente>>[/COLOR]"
+        title= "Pagina siguiente>>"
         itemlist.append( Item(channel=__channel__, title=title, url=next_page, action="peliculas", fanart="http://s15.postimg.org/id6ec47vf/bricocinefondo.jpg", thumbnail="http://s7.postimg.org/w2e0nr7hn/pdksiguiente.jpg", folder=True) )
     except: pass
     
@@ -151,9 +149,8 @@ def fanart(item):
     
                     itemlist.append( Item(channel=__channel__, title = item.title , action="findvideos", url=item.url, server="torrent", thumbnail=item.thumbnail, fanart=item.extra,  folder=True) )
     title ="Info"
-    title = title.replace(title,"[COLOR skyblue]"+title+"[/COLOR]")
     itemlist.append( Item(channel=__channel__, action="info" , title=title , url=item.url, thumbnail=item.thumbnail, fanart=item.extra, folder=False ))
-    title= "[COLOR crimson]Trailer[/COLOR]"
+    title= "Trailer"
     itemlist.append( Item(channel=__channel__, action="trailer", title=title , url=item.url , thumbnail=item.thumbnail , plot=item.plot , fulltitle = item.title , fanart=item.extra, folder=True) )
     return itemlist
 
@@ -174,8 +171,6 @@ def findvideos(item):
     for title_links, title_torrent, url_torrent, fanart_title in matches:
         ## torrent
         title_torrent = "["+title_torrent.replace("file","torrent")+"]"
-        title_torrent = title_torrent.replace(title_torrent,"[COLOR green]"+title_torrent+"[/COLOR]")
-        title_links = title_links.replace(title_links,"[COLOR sandybrown]"+title_links+"[/COLOR]")
         title_torrent = title_links+"- "+title_torrent
         url_torrent = base64.decodestring(url_torrent.split('&u=')[1][::-1])
         
@@ -209,7 +204,7 @@ def trailer(item):
         server = video[2]
         
         #xbmctools.addnewvideo( __channel__ , "play" , category , server ,  , url , thumbnail , plot )
-        title= "[COLOR crimson]Trailer - [/COLOR]"
+        title= "Trailer - "
         itemlist.append( Item(channel=__channel__, action="play", server=server, title=title + videotitle  , url=url , thumbnail=item.thumbnail , plot=item.plot , fulltitle = item.title , fanart="http://s23.postimg.org/84vkeq863/movietrailers.jpg", folder=False) )
     return itemlist
 
@@ -223,12 +218,9 @@ def info(item):
     else:
     
         title= scrapertools.get_match(data,'<span class="title">([^"]+)</span>')
-        title = title.replace(title,"[COLOR aqua][B]"+title+"[/B][/COLOR]")
         plot = scrapertools.get_match(data,'<div class="description" itemprop="text.*?">([^<]+).*?</div></div></div>')
-        plot_title = "Sinopsis" + "[CR]"
-        plot_title = plot_title.replace(plot_title,"[COLOR red]"+plot_title+"[/COLOR]")
+        plot_title = "Sinopsis" + "\n"
         plot= plot_title + plot
-        plot = plot.replace(plot,"[COLOR white][B]"+plot+"[/B][/COLOR]")
         fanart="http://s11.postimg.org/qu66qpjz7/zentorrentsfanart.jpg"
         tbd = TextBox("DialogTextViewer.xml", os.getcwd(), "Default")
         tbd.ask(title, plot,fanart)

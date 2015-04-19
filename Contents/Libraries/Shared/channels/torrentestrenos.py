@@ -103,7 +103,7 @@ def buscador(item):
     matches = re.compile(patron,re.DOTALL).findall(data)
     scrapertools.printMatches(matches)
     if len(matches)==0 :
-        itemlist.append( Item(channel=__channel__, title="[COLOR gold][B]No se encontraron coincidencias...[/B][/COLOR]", thumbnail ="http://s6.postimg.org/w7nc1wh8x/torrnoisethumb.png", fanart ="http://s6.postimg.org/jez81z5n5/torrnoisefan.jpg",folder=False) )
+        itemlist.append( Item(channel=__channel__, title="No se encontraron coincidencias...", thumbnail ="http://s6.postimg.org/w7nc1wh8x/torrnoisethumb.png", fanart ="http://s6.postimg.org/jez81z5n5/torrnoisefan.jpg",folder=False) )
     
     for scrapedthumbnail, scrapedurl, scrapedtitulo, scrapedcreatedate in matches:
         scrapedtitulo = scrapedtitulo + "(Torrent:" + scrapedcreatedate + ")"
@@ -136,9 +136,7 @@ def peliculas(item):
     scrapertools.printMatches(matches)
     
     for scrapedthumbnail, scrapedurl, scrapedtitulo, scrapedcreatedate in matches:
-        scrapedtitulo= scrapedtitulo.replace(scrapedtitulo,"[COLOR khaki]"+scrapedtitulo+"[/COLOR]")
-        scrapedcreatedate= scrapedcreatedate.replace(scrapedcreatedate,"[COLOR white]"+scrapedcreatedate+"[/COLOR]")
-        torrent_tag="[COLOR green]Torrent:[/COLOR]"
+        torrent_tag="Torrent:"
         scrapedtitulo = scrapedtitulo +  "(" +torrent_tag + scrapedcreatedate + ")"
         scrapedthumbnail = "http://www.torrentestrenos.com/" + scrapedthumbnail
         scrapedurl = "http://www.torrentestrenos.com" + scrapedurl
@@ -165,7 +163,7 @@ def peliculas(item):
     next_page_number = current_page_number + 1
     next_page = item.url % (next_page_number)
     
-    title= "[COLOR green]Pagina siguiente>>[/COLOR]"
+    title= "Pagina siguiente>>"
     if next_page.replace("http://www.torrentestrenos.com","") in data:
         itemlist.append( Item(channel=__channel__, title=title, url=next_page, action="peliculas", thumbnail="http://s6.postimg.org/4hpbrb13l/texflecha2.png", fanart="http://s6.postimg.org/44tc7dtg1/tefanartgeneral.jpg", folder=True) )
 
@@ -220,7 +218,6 @@ def fanart_pelis(item):
             item.extra= fanart
             itemlist.append( Item(channel=__channel__, title =item.title , url=item.url, action="findvideos", thumbnail=item.thumbnail, fanart=item.extra, folder=True) )
     title ="Info"
-    title = title.replace(title,"[COLOR skyblue][B]"+title+"[/B][/COLOR]")
     itemlist.append( Item(channel=__channel__, action="info" , title=title , url=item.url, thumbnail=item.thumbnail, fanart=item.extra, folder=False ))
     
     return itemlist
@@ -341,7 +338,6 @@ def fanart_series(item):
                 item.extra= fanart
                 itemlist.append( Item(channel=__channel__, title =item.title , url=item.url, action="findvideos", thumbnail=item.thumbnail, fanart=item.extra, folder=True) )
     title ="Info"
-    title = title.replace(title,"[COLOR skyblue][B]"+title+"[/B][/COLOR]")
     itemlist.append( Item(channel=__channel__, action="info" , title=title , url=item.url, thumbnail=item.thumbnail, fanart=item.extra, folder=False ))
 
     return itemlist
@@ -364,8 +360,7 @@ def findvideos(item):
     matches = re.compile(patron,re.DOTALL).findall(data)
     
     for scrapedthumbnail, scrapedtitulo, scrapedplot, scrapedurl in matches:
-        title_tag="[COLOR green]Ver--[/COLOR]"
-        scrapedtitulo= scrapedtitulo.replace(scrapedtitulo,"[COLOR white]"+scrapedtitulo+"[/COLOR]")
+        title_tag="Ver--"
         scrapedtitulo= title_tag + scrapedtitulo
         scrapedthumbnail = "http://www.torrentestrenos.com/" + scrapedthumbnail
         scrapedplot = scrapedplot.replace("&aacute;","a")
@@ -395,10 +390,8 @@ def info(item):
     data = scrapertools.cachePage(url)
     data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;","",data)
     title= scrapertools.get_match(data,'<h4>(.*?)</h4>')
-    title = title.replace(title,"[COLOR aqua][B]"+title+"[/B][/COLOR]")
     scrapedplot = scrapertools.get_match(data,'</p><p>([^<]+)</p><p>')
-    scrapedplot = scrapedplot.replace(scrapedplot,"[COLOR white]"+scrapedplot+"[/COLOR]")
-    plot_tag="[COLOR green][B]Sinopsis[/B][/COLOR]" + "[CR]"
+    plot_tag="Sinopsis" + "\n"
     scrapedplot= plot_tag + scrapedplot
     scrapedplot = scrapedplot.replace("&aacute;","a")
     scrapedplot = scrapedplot.replace("&iacute;","i")

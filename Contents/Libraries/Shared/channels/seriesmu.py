@@ -42,26 +42,21 @@ def mainlist(item):
     logger.info("pelisalacarta.seriesmu mainlist")
     itemlist = []
     title ="Habilita tu cuenta en la configuración..."
-    title = title.replace(title,"[COLOR greenyellow]"+title+"[/COLOR]")
     if config.get_setting("seriesmuaccount")!="true":
         itemlist.append( Item( channel=__channel__ , title=title , action="openconfig" , url="" , fanart="http://s17.postimg.org/6d3kggvvj/smfanlog.jpg", thumbnail="http://s2.postimg.org/c678law6x/smloglog.jpg",  folder=False ) )
     else:
         login()
         title ="Mis Series"
-        title = title.replace(title,"[COLOR aqua][B]"+title+"[/B][/COLOR]")
         
         itemlist.append( Item(channel=__channel__, title=title      , action="mis_series", url="http://series.mu/catalogo/mis-series/1/", fanart="http://s27.postimg.org/agsoe4jir/smumsfan.jpg", thumbnail= "https://cdn4.iconfinder.com/data/icons/sabre/snow_sabre_black/512/folder_black_library.png"))
         title ="Series"
-        title = title.replace(title,"[COLOR aqua][B]"+title+"[/B][/COLOR]")
         
         itemlist.append( Item(channel=__channel__, title=title      , action="catalogo", url="http://series.mu/catalogo/series/1/", fanart="http://s12.postimg.org/eh5r2oefh/smsfan.jpg", thumbnail="https://lh3.googleusercontent.com/-eSiNj7X0wQU/AAAAAAAAAAI/AAAAAAAAAEM/iolph9ldX5w/photo.jpg"))
         title ="Peliculas"
-        title = title.replace(title,"[COLOR aqua][B]"+title+"[/B][/COLOR]")
         
         itemlist.append( Item(channel=__channel__, title=title     , action="catalogo", url="http://series.mu/catalogo/pelis/1/", fanart="http://s7.postimg.org/ybxhxdc0r/smpfan.jpg", thumbnail="http://cdn.flaticon.com/png/256/24949.png"))
        
         title ="Buscar..."
-        title = title.replace(title,"[COLOR aqua][B]"+title+"[/B][/COLOR]")
         
         itemlist.append( Item(channel=__channel__, title=title      , action="search", url="http://series.mu/search/", fanart="http://s7.postimg.org/9be35fm6z/smbfan.jpg", thumbnail="http://cdn.mysitemyway.com/etc-mysitemyway/icons/legacy-previews/icons/black-ink-grunge-stamps-textures-icons-people-things/060097-black-ink-grunge-stamp-textures-icon-people-things-eye6.png"))
     
@@ -142,7 +137,6 @@ def mis_series(item):
 
     for scrapedurl, scrapedthumbnail, scrapedtitle in matches:
         scrapedurl = urlparse.urljoin(host, scrapedurl)
-        scrapedtitle = scrapedtitle.replace(scrapedtitle,"[COLOR sandybrown][B]"+scrapedtitle+"[/B][/COLOR]")
         
         itemlist.append( Item(channel=__channel__, title =scrapedtitle , url=scrapedurl, action="temporadas", thumbnail=scrapedthumbnail, fanart="http://s21.postimg.org/gmwquc5hz/smfan2.jpg", folder=True) )
 
@@ -173,8 +167,6 @@ def catalogo(item):
     
 
         for scrapedurl, scrapedthumbnail, scrapedtitle, scrapedinfo in matches:
-            scrapedinfo = scrapedinfo.replace(scrapedinfo,"[COLOR gold]"+scrapedinfo+"[/COLOR]")
-            scrapedtitle = scrapedtitle.replace(scrapedtitle,"[COLOR white]"+scrapedtitle+"[/COLOR]")
             title = scrapedtitle +  " (" + scrapedinfo + ")"
             scrapedurl = urlparse.urljoin(host, scrapedurl)
             if "series" in scrapedurl:
@@ -189,7 +181,7 @@ def catalogo(item):
     try:
         next_page = scrapertools.get_match(data,'<a href="([^"]+)">Siguiente &rsaquo;</a></li></ul></div></div></div>')
         next_page = urlparse.urljoin(host, next_page)
-        title= "[COLOR blue]>> Página siguiente[/COLOR]"
+        title= ">> Página siguiente"
         itemlist.append( Item(channel=__channel__, title=title, url=next_page, action="catalogo" , fanart="http://s21.postimg.org/gmwquc5hz/smfan2.jpg", thumbnail="http://s21.postimg.org/pro3rcu6v/smarrow.jpg", folder=True) )
     except: pass
    
@@ -218,21 +210,14 @@ def peliculas(item):
         scrapedhost= scrapedhost.replace("eu","")
         scrapedhost= scrapedhost.replace("sx","")
         puntuacion = scrapertools.get_match(data,'<li><div class="num" id="val-score">(.*?)</div>')
-        puntuacion = puntuacion.replace(puntuacion,"[COLOR yellow]"+puntuacion+"[/COLOR]")
         puntuacion_title = "Puntuación :"
-        puntuacion_title = puntuacion_title.replace(puntuacion_title,"[COLOR pink]"+puntuacion_title+"[/COLOR]")
-        puntuacion = puntuacion_title + " " + puntuacion + "[CR]"
+        puntuacion = puntuacion_title + " " + puntuacion + "\n"
         scrapedplot = scrapertools.get_match(data,'<h2>(.*?)<div class="card media-chapters">')
         plotformat = re.compile('<p>(.*?)</p>',re.DOTALL).findall(scrapedplot)
-        scrapedplot = scrapedplot.replace(scrapedplot,"[COLOR white]"+scrapedplot+"[/COLOR]")
         for plot in plotformat:
-            scrapedplot = scrapedplot.replace(plot,"[COLOR skyblue][B]"+plot+"[/B][/COLOR]")
-            scrapedplot = scrapedplot.replace("</h2><p>","[CR]")
+            scrapedplot = scrapedplot.replace("</h2><p>","\n")
             scrapedplot = scrapedplot.replace("</p></div>","")
         scrapedplot = puntuacion + scrapedplot
-        scrapedhost = scrapedhost.replace(scrapedhost,"[COLOR burlywood]"+scrapedhost+"[/COLOR]")
-        scrapedaudio = scrapedaudio.replace(scrapedaudio,"[COLOR white]"+scrapedaudio+"[/COLOR]")
-        scrapedcalidad = scrapedcalidad.replace(scrapedcalidad,"[COLOR olive]"+scrapedcalidad+"[/COLOR]")
         fanart = scrapertools.get_match(data,'<div class="media-cover" style="background-image: url\(http://series.mu([^"]+)\)')
         fanart = urlparse.urljoin(host, fanart)
         
@@ -262,14 +247,12 @@ def temporadas(item):
     if '<div class=""></div>' in data:
         action="seguir"
         title= "Seguir"
-        title = title.replace(title,"[COLOR yellow]"+title+"[/COLOR]")
         thumbnail= "http://s14.postimg.org/ca5boj275/smseguir.png"
 
 
     else:
         action="siguiendo"
         title= "Siguiendo"
-        title = title.replace(title,"[COLOR green]"+title+"[/COLOR]")
         thumbnail="http://s28.postimg.org/ugtnbj6z1/smsiguiendo2.png"
     
     itemlist.append( Item(channel=item.channel, title=title, url=seguir, fanart=fanart, thumbnail=thumbnail, action=action))
@@ -278,7 +261,6 @@ def temporadas(item):
         
         action="abandono"
         title= "Abandonar"
-        title = title.replace(title,"[COLOR red]"+title+"[/COLOR]")
 
         itemlist.append( Item(channel=item.channel, title=title, url=abandonar, fanart=fanart, thumbnail="http://s18.postimg.org/hh4l8hj1l/smabandonar2.png", action=action))
 
@@ -307,24 +289,19 @@ def temporadas(item):
         for scrapednumber, scrapedtitle, scrapedeyes, scrapedurl in matches:
         
             if "open" in scrapedeyes:
-               scrapedeyes = re.sub(r"eye-w icon-eye-open","[COLOR salmon]"+" [Visto]"+"[/COLOR]",scrapedeyes)
+               scrapedeyes = re.sub(r"eye-w icon-eye-open"," [Visto]",scrapedeyes)
             if "close" in scrapedeyes:
-               scrapedeyes = re.sub(r"eye-w icon-eye-close","[COLOR chartreuse]"+" [Pendiente]"+"[/COLOR]",scrapedeyes)
+               scrapedeyes = re.sub(r"eye-w icon-eye-close"," [Pendiente]",scrapedeyes)
             scrapedtitle = nombre_temporada + "X" + scrapednumber + scrapedtitle + scrapedeyes
             scrapedtitle = scrapedtitle.replace("="," ")
             scrapedtitle = scrapedtitle.replace("temp","Temporada")
-            scrapedtitle = scrapedtitle.replace(scrapedtitle,"[COLOR white]"+scrapedtitle+"[/COLOR]")
             puntuacion = scrapertools.get_match(data,'<li><div class="num" id="val-score">(.*?)</div>')
-            puntuacion = puntuacion.replace(puntuacion,"[COLOR yellow]"+puntuacion+"[/COLOR]")
             puntuacion_title = "Puntuación :"
-            puntuacion_title = puntuacion_title.replace(puntuacion_title,"[COLOR pink]"+puntuacion_title+"[/COLOR]")
-            puntuacion = puntuacion_title + " " + puntuacion + "[CR]"
+            puntuacion = puntuacion_title + " " + puntuacion + "\n"
             scrapedplot = scrapertools.get_match(data,'<h2>(.*?)<div class="card media-chapters">')
             plotformat = re.compile('<p>(.*?)</p>',re.DOTALL).findall(scrapedplot)
-            scrapedplot = scrapedplot.replace(scrapedplot,"[COLOR white]"+scrapedplot+"[/COLOR]")
             for plot in plotformat:
-                scrapedplot = scrapedplot.replace(plot,"[COLOR skyblue][B]"+plot+"[/B][/COLOR]")
-                scrapedplot = scrapedplot.replace("</h2><p>","[CR]")
+               scrapedplot = scrapedplot.replace("</h2><p>","\n")
                 scrapedplot = scrapedplot.replace("</p></div>","")
             scrapedplot = puntuacion + scrapedplot
             fanart = scrapertools.get_match(data,'<div class="media-cover" style="background-image: url\(http://series.mu([^"]+)\)')
@@ -353,7 +330,6 @@ def seguir(item):
     data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;","",data)
     if "status" in item.url:
         title= "Siguiendo!!"
-        title = title.replace(title,"[COLOR green]"+title+"[/COLOR]")
         itemlist.append( Item(channel=__channel__, title= title,  fanart=item.fanart, thumbnail="http://s9.postimg.org/vc0l27qgf/smyasigue.png", folder=False) )
 
     return itemlist
@@ -367,7 +343,6 @@ def siguiendo(item):
     data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;","",data)
     if "status" in item.url:
         title= "Ya sigues esta serie..."
-        title = title.replace(title,"[COLOR red]"+title+"[/COLOR]")
         itemlist.append( Item(channel=__channel__, title= title, fanart=item.fanart, thumbnail="http://s12.postimg.org/ms7q9hj4d/smnotallowed.png", folder=False) )
     
     return itemlist
@@ -381,7 +356,6 @@ def abandono(item):
     data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;","",data)
     if "status" in item.url:
         title= "Abandonada..."
-        title = title.replace(title,"[COLOR red]"+title+"[/COLOR]")
         itemlist.append( Item(channel=__channel__, title= title, fanart=item.fanart, thumbnail="http://www.clker.com/cliparts/2/l/m/p/B/b/error-hi.png", folder=False) )
     
     return itemlist
@@ -421,9 +395,6 @@ def findvideos(item):
             scrapedhost= scrapedhost.replace("net","")
             scrapedhost= scrapedhost.replace("eu","")
             scrapedhost= scrapedhost.replace("sx","")
-            scrapedhost = scrapedhost.replace(scrapedhost,"[COLOR burlywood]"+scrapedhost+"[/COLOR]")
-            scrapedaudio = scrapedaudio.replace(scrapedaudio,"[COLOR white]"+scrapedaudio+"[/COLOR]")
-            scrapedcalidad = scrapedcalidad.replace(scrapedcalidad,"[COLOR olive]"+scrapedcalidad+"[/COLOR]")
             scrapedurl = urlparse.urljoin(host, scrapedurl)
             
             title = scrapedhost + "--" + scrapedaudio + "--" + scrapedcalidad
