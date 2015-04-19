@@ -36,7 +36,7 @@ def searchresults(params,url="",category=""):
         tecleado = url
     tecleado = tecleado.replace(" ", "+")
     
-    # Lanza las búsquedas
+    # Lanza las b?squedas
     matches = []
     itemlist = do_search_results(tecleado)
     for item in itemlist:

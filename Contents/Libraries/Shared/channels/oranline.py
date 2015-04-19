@@ -252,7 +252,7 @@ def test():
     # mainlist es "peliculas | documentales"
     mainlist_items = mainlist(Item())
 
-    # peliculas es "novedades | alfabetco | generos | idiomas"
+    # peliculas es "novedades | alfabetco | generos | idiomas"
     peliculas_items = peliculas(mainlist_items[0])
 
     # novedades es la lista de pelis

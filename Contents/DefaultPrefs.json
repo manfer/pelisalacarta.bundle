@@ -233,6 +233,46 @@
     "secure": "true"
   },
   {
+    "id": "seriesmuaccount",
+    "label": "Cuenta seriesmu",
+    "type": "bool",
+    "default": "false"
+  },
+  {
+    "id": "seriesmuuser",
+    "label": "Usuario",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "id": "seriesmupassword",
+    "label": "Password",
+    "type": "text",
+    "option": "hidden",
+    "default": "",
+    "secure": "true"
+  },
+  {
+    "id": "torrentestrenosaccount",
+    "label": "Cuenta torrentestrenos",
+    "type": "bool",
+    "default": "false"
+  },
+  {
+    "id": "torrentestrenosuser",
+    "label": "Usuario",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "id": "torrentestrenospassword",
+    "label": "Password",
+    "type": "text",
+    "option": "hidden",
+    "default": "",
+    "secure": "true"
+  },
+  {
     "id": "personalchannel",
     "label": "Canal personal",
     "type": "bool",

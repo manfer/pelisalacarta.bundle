@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #------------------------------------------------------------
 # pelisalacarta - XBMC Plugin
 # Canal para cuevana
@@ -96,7 +96,7 @@ def porGenero(item):
             )
         )
 
-    return itemlist	
+    return itemlist
 
 def agregadas(item):
     logger.info("[pelisadicto.py] agregadas")
@@ -116,7 +116,7 @@ def agregadas(item):
         itemlist.append(
             Item(
                 channel = __channel__,
-                action = "findvideos3",
+                action = "findvideos",
                 title = title,
                 fulltitle = title,
                 url = url,
@@ -141,8 +141,18 @@ def agregadas(item):
 
     return itemlist
 
-def findvideos3(item):
+def findvideos(item):
+    logger.info("[pelisadicto.py] findvideos")
     itemlist = []
+
+    data = re.sub(r"\n|\s{2}","",scrapertools.cache_page(item.url))
+
+    patron = "<!-- SINOPSIS --> "
+    patron += "<h2>[^<]+</h2> "
+    patron += "<p>([^<]+)</p>"
+    matches = re.compile(patron,re.DOTALL).findall(data)
+    plot = matches[0]
+
     # Descarga la pagina
     data = scrapertools.cache_page(item.url)
     patron = '<tr>.*?'
@@ -154,11 +164,11 @@ def findvideos3(item):
         if "/img/2.png" in scrapedidioma: idioma="Latino"
         if "/img/3.png" in scrapedidioma: idioma="Subtitulado"
         title = item.title + " ["+scrapedcalidad+"][" + idioma + "][" + scrapedserver + "]"
-        itemlist.append( Item(channel=__channel__, action="play", title=title, fulltitle=title , url=scrapedurl , thumbnail="" , plot="" , show = item.show) )
+        itemlist.append( Item(channel=__channel__, action="play", title=title, fulltitle=title , url=scrapedurl , thumbnail="" , plot=plot , show = item.show) )
     return itemlist	
-	
-def play(item):
 
+def play(item):
+    logger.info("[pelisadicto.py] play")
     itemlist = servertools.find_video_items(data=item.url)
 
     for videoitem in itemlist:
@@ -167,38 +177,4 @@ def play(item):
         videoitem.thumbnail = item.thumbnail
         videoitem.channel = __channel__
 
-    return itemlist    
-
-def buscar(item):
-    itemlist = []
-    keyboard = xbmc.Keyboard()
-    keyboard.doModal()
-    busqueda=keyboard.getText()
-    # Descarga la pagina
-    data = scrapertools.cache_page("http://pelisadicto.com/buscar/" + busqueda)
-    #logger.info("data="+data)
-    # Extrae las entradas
-    patron  = '<li class="col-xs-6 col-sm-2 CALBR">.*?'
-    patron += '<a href="(.*?)".*?src="(.*?)".*?alt="(.*?)".*?calidad">(.*?)<.*?</li>'
-    matches = re.compile(patron,re.DOTALL).findall(data)
-    for url,thumbnail,tit,calidad in matches:
-        url="http://pelisadicto.com"+url
-        data = scrapertools.cache_page(url)
-        patron = "<!-- SINOPSIS -->.*?"
-        patron += "<h2>.*?</h2>.*?"
-        patron += "<p>(.*?)</p>"
-        matches = re.compile(patron,re.DOTALL).findall(data)
-        plot = matches[0]
-        thumbnail = "http://pelisadicto.com"+thumbnail
-        itemlist.append( Item(channel=__channel__, action="findvideos3", title=tit, fulltitle=tit , url=url , thumbnail=thumbnail , plot=plot , show=tit, viewmode="movie_with_plot") )
-    patron  = '<li class="active">.*?</li><li><span><a href="(.*?)"'
-    matches = re.compile(patron,re.DOTALL).findall(data)
-    if len(matches)>0:
-        parametro = matches[0]
-        patron = '<ul class="listitems">.*?<li><a href="(.*?)"'
-        matches = re.compile(patron,re.DOTALL).findall(data)
-        genero = matches[0]
-        genero = genero.replace("mejores-peliculas", "genero")
-        url = genero + "/" + parametro
-        itemlist.append( Item(channel=__channel__, action="agregadas", title="Página siguiente >>" , url=url) )
     return itemlist

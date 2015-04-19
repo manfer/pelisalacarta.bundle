@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
 # pelisalacarta - XBMC Plugin
-# Canal para zampaseries
+# Canal para vseries
 # http://blog.tvalacarta.info/plugin-xbmc/pelisalacarta/
 #------------------------------------------------------------
 
@@ -19,8 +19,8 @@ DEBUG = config.get_setting("debug")
 
 __category__ = "A"
 __type__ = "generic"
-__title__ = "Zampaseries"
-__channel__ = "zampaseries"
+__title__ = "VSeries"
+__channel__ = "vseries"
 __language__ = "ES"
 __creationdate__ = "20140615"
 
@@ -30,24 +30,10 @@ DEFAULT_HEADERS.append( ["User-Agent","Mozilla/5.0 (Macintosh; U; Intel Mac OS X
 def isGeneric():
     return True
 
-def login():
-    url = "http://vserie.com/login"
-    post = {"username":config.get_setting("zampaseriesuser"),"password":config.get_setting("zampaseriespassword"),"recordar":"recordar"}
-    data = scrapertools.cache_page(url,post=urllib.urlencode(post))
-
-def openconfig(item):
-    if "xbmc" in config.get_platform() or "boxee" in config.get_platform():
-        config.open_settings( )
-    return []
-
 def mainlist(item):
-    logger.info("pelisalacarta.channels.zampaseries mainlist")
+    logger.info("pelisalacarta.channels.vseries mainlist")
 
     itemlist = []
-    #if config.get_setting("zampaseriesaccount")!="true":
-    #    itemlist.append( Item( channel=__channel__ , title="Habilita tu cuenta en la configuración..." , action="openconfig" , url="" , folder=False ) )
-    #else:
-    #    login()
     itemlist.append( Item(channel=__channel__, action="menuseries"    , title="Series"            , url="" ))
     itemlist.append( Item(channel=__channel__, action="peliculas"     , title="Películas"         , url="http://vserie.com/peliculas" ))
     itemlist.append( Item(channel=__channel__, action="search"        , title="Buscar..."         , url="http://vserie.com/search" ))
@@ -55,7 +41,7 @@ def mainlist(item):
     return itemlist
 
 def menuseries(item):
-    logger.info("pelisalacarta.channels.zampaseries menuseries")
+    logger.info("pelisalacarta.channels.vseries menuseries")
 
     itemlist = []
     itemlist.append( Item(channel=__channel__, action="novedades" , title="Últimos episodios" , url="http://vserie.com/series" ))
@@ -64,7 +50,7 @@ def menuseries(item):
     return itemlist
 
 def search(item,texto):
-    logger.info("pelisalacarta.channels.zampaseries search")
+    logger.info("pelisalacarta.channels.vseries search")
 
     try:
         if config.get_setting("zampaseriesaccount")=="true":
@@ -113,7 +99,7 @@ def search(item,texto):
         return []
 
 def novedades(item):
-    logger.info("pelisalacarta.channels.zampaseries novedades")
+    logger.info("pelisalacarta.channels.vseries novedades")
 
     if config.get_setting("zampaseriesaccount")=="true":
         login()
@@ -139,7 +125,7 @@ def novedades(item):
     return itemlist
 
 def series(item,data=""):
-    logger.info("pelisalacarta.channels.zampaseries series")
+    logger.info("pelisalacarta.channels.vseries series")
 
 
     if config.get_setting("zampaseriesaccount")=="true":
@@ -186,7 +172,7 @@ def series(item,data=""):
     return itemlist
 
 def peliculas(item,data=""):
-    logger.info("pelisalacarta.channels.zampaseries peliculas")
+    logger.info("pelisalacarta.channels.vseries peliculas")
 
 
     if config.get_setting("zampaseriesaccount")=="true":
@@ -234,7 +220,7 @@ def peliculas(item,data=""):
     return itemlist
 
 def episodios(item):
-    logger.info("pelisalacarta.channels.zampaseries episodios")
+    logger.info("pelisalacarta.channels.vseries episodios")
 
 
     if config.get_setting("zampaseriesaccount")=="true":
@@ -261,7 +247,7 @@ def episodios(item):
     return itemlist
 
 def findvideos(item):
-    logger.info("pelisalacarta.channels.zampaseries findvideos")
+    logger.info("pelisalacarta.channels.vseries findvideos")
 
 
     if config.get_setting("zampaseriesaccount")=="true":
@@ -298,7 +284,7 @@ def findvideos(item):
     return itemlist
 
 def play(item):
-    logger.info("pelisalacarta.channels.zampaseries play url="+item.url)
+    logger.info("pelisalacarta.channels.vseries play url="+item.url)
 
     if config.get_setting("zampaseriesaccount")=="true":
         login()

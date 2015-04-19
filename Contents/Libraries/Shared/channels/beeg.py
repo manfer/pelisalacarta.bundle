@@ -16,7 +16,7 @@ from core import scrapertools
 from core.item import Item
 from servers import servertools
 
-CHANNELNAME = "beeg"
+__channel__ = "beeg"
 DEBUG = config.get_setting("debug")
 BASE_URL = "http://beeg.com/"
 
@@ -28,7 +28,7 @@ def mainlist(item):
     itemlist = []
     itemlist.append(
         Item(
-            channel = CHANNELNAME,
+            channel = __channel__,
             action = "videos",
             title = u"Útimos Vídeos",
             url = BASE_URL
@@ -36,7 +36,7 @@ def mainlist(item):
     )
     itemlist.append(
         Item(
-            channel = CHANNELNAME,
+            channel = __channel__,
             action = "listcategorias",
             title = u"Listado Tags Populares",
             url = BASE_URL,
@@ -45,7 +45,7 @@ def mainlist(item):
     )
     itemlist.append(
         Item(
-            channel = CHANNELNAME,
+            channel = __channel__,
             action = "listcategorias",
             title = u"Listado Tags Completo",
             url = BASE_URL,
@@ -54,7 +54,7 @@ def mainlist(item):
     )
     itemlist.append(
         Item(
-            channel = CHANNELNAME,
+            channel = __channel__,
             action = "videos",
             title = u"Vídeos Larga Duración",
             url = urlparse.urljoin( BASE_URL, "/tag/long+videos" )
@@ -132,7 +132,7 @@ def videos(item):
         if (DEBUG): logger.info("title=["+scrapedtitle+"], url=["+scrapedurl+"], thumbnail=["+scrapedthumbnail+"]")            
         itemlist.append(
             Item(
-                channel = CHANNELNAME,
+                channel = __channel__,
                 action = "play",
                 title = scrapedtitle,
                 url = scrapedurl,
@@ -161,7 +161,7 @@ def listcategorias(item):
     for scrapedurl, scrapedtag in matches:
         itemlist.append(
             Item(
-                channel = CHANNELNAME,
+                channel = __channel__,
                 action = "videos",
                 title = unicode( scrapedtag, "utf-8" ),
                 url = urlparse.urljoin( BASE_URL, scrapedurl )
@@ -178,7 +178,7 @@ def listcategorias(item):
     for scrapedurl, scrapedtag in matches:
         itemlist.append(
             Item(
-                channel = CHANNELNAME,
+                channel = __channel__,
                 action = "videos",
                 title = unicode( scrapedtag, "utf-8" ),
                 url = urlparse.urljoin( BASE_URL, scrapedurl )
@@ -213,7 +213,7 @@ def play(item):
     url = scrapertools.get_match(data,patron)+"?start=0"
     itemlist.append(
         Item(
-            channel = CHANNELNAME,
+            channel = __channel__,
             action = "play",
             title = item.title,
             fulltitle = item.fulltitle,
