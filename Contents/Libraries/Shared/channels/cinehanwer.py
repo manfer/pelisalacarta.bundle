@@ -132,7 +132,7 @@ def calidades(item):
     for scrapedurl,scrapedtitle in matches:
         title = scrapedtitle.strip()
         url = urlparse.urljoin(item.url,scrapedurl)
-        if (DEBUG): logger.info("title=["+title+"], url=["+url+"], thumbnail=["+thumbnail+"]")
+        if (DEBUG): logger.info("title=["+title+"], url=["+url+"]")
         itemlist.append(
             Item(
                 channel = __channel__,
@@ -160,7 +160,7 @@ def generos(item):
     for scrapedurl,scrapedtitle in matches:
         title = scrapedtitle.strip()
         url = urlparse.urljoin(item.url,scrapedurl)
-        if (DEBUG): logger.info("title=["+title+"], url=["+url+"], thumbnail=["+thumbnail+"]")
+        if (DEBUG): logger.info("title=["+title+"], url=["+url+"]")
         itemlist.append(
             Item(
                 channel = __channel__,
