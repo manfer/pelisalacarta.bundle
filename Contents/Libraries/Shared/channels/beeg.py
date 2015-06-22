@@ -155,7 +155,7 @@ def listcategorias(item):
     # Tags Populares
     patron_popular = '<div class="block block-tags-popular">(.*?)</ul>'
     data_popular = scrapertools.find_single_match(data, patron_popular)
-    patron_tag = '<li><a target="_self" href="([^"]+)"\s?>(.*?)</a></li>'
+    patron_tag = '<li><a target="_self" href="([^"]+)".*?>(.*?)</a></li>'
     matches = re.compile(patron_tag,re.DOTALL).findall(data_popular)
 
     for scrapedurl, scrapedtag in matches:
@@ -205,7 +205,7 @@ def play(item):
     '''
     
     data = scrapertools.downloadpageGzip(item.url)
-    logger.info("data="+data)
+    if DEBUG: logger.info("data="+data)
 
     #'file': 'http://45.video.mystreamservice.com/480p/4014660.mp4',
     #'file': 'http://02.007i.net/480p/4815411.mp4',
