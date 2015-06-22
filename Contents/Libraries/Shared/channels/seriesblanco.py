@@ -12,17 +12,24 @@ from core import scrapertools
 from core.item import Item
 from servers import servertools
 
+
 __channel__ = "seriesblanco"
+
 __category__ = "F"
+
 __type__ = "generic"
+
 __title__ = "Series Blanco"
+
 __language__ = "ES"
 
+
 host = "http://seriesblanco.com/"
-idiomas = {'es':'Español','la':'Latino','vos':'VOS','vo':'VO'}
+
+idiomas = {'es':'Español','la':'Latino','vos':'VOS','vo':'VO', 'japovose':'VOSE'}
+
 
 DEBUG = config.get_setting("debug")
-
 def isGeneric():
     return True
 
@@ -44,6 +51,7 @@ def search(item,texto):
     data = scrapertools.cache_page(item.url)
     data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;|<Br>|<BR>|<br>|<br/>|<br />|-\s","",data)
     data = re.sub(r"<!--.*?-->","",data)
+    data = unicode( data, "iso-8859-1" , errors="replace" ).encode("utf-8")
 
     #<div style='float:left;width: 620px;'><div style='float:left;width: 33%;text-align:center;'><a href='/serie/20/against-the-wall.html' '><img class='ict' src='http://4.bp.blogspot.com/-LBERI18Cq-g/UTendDO7iNI/AAAAAAAAPrk/QGqjmfdDreQ/s320/Against_the_Wall_Seriesdanko.jpg' alt='Capitulos de: Against The Wall' height='184' width='120'></a><br><div style='text-align:center;line-height:20px;height:20px;'><a href='/serie/20/against-the-wall.html' style='font-size: 11px;'> Against The Wall</a></div><br><br>
 
@@ -72,6 +80,7 @@ def series(item):
     data = scrapertools.cache_page(item.url)
     data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;|<Br>|<BR>|<br>|<br/>|<br />|-\s","",data)
     data = re.sub(r"<!--.*?-->","",data)
+    data = unicode( data, "iso-8859-1" , errors="replace" ).encode("utf-8")
 
     patron = "<li><a href='([^']+)' title='([^']+)'>[^<]+</a></li>"
 
@@ -91,10 +100,12 @@ def episodios(item):
     data = scrapertools.cache_page(item.url)
     data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;|<Br>|<BR>|<br>|<br/>|<br />|-\s","",data)
     data = re.sub(r"<!--.*?-->","",data)
+    data = unicode( data, "iso-8859-1" , errors="replace" ).encode("utf-8")
+
     data = re.sub(r"a></td><td> <img src=/banderas/","a><idioma/",data)
     data = re.sub(r" <img src=/banderas/","|",data)
-    data = re.sub(r"\.png border='\d+' height='\d+' width='\d+' /><","/idioma><",data)
-    data = re.sub(r"\.png border='\d+' height='\d+' width='\d+' />","",data)
+    data = re.sub(r"\.png border='\d+' height='\d+' width='\d+'[^>]+><","/idioma><",data)
+    data = re.sub(r"\.png border='\d+' height='\d+' width='\d+'[^>]+>","",data)
 
     #<a href='/serie/534/temporada-1/capitulo-00/the-big-bang-theory.html'>1x00 - Capitulo 00 </a></td><td> <img src=/banderas/vo.png border='0' height='15' width='25' /> <img src=/banderas/vos.png border='0' height='15' width='25' /></td></tr>
 
@@ -127,23 +138,65 @@ def findvideos(item):
     data = scrapertools.cache_page(item.url)
     data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;|<Br>|<BR>|<br>|<br/>|<br />|-\s","",data)
     data = re.sub(r"<!--.*?-->","",data)
-    data = re.sub(r"<td class='tam12'></td></tr>","<td class='tam12'>SD</td></tr>",data)
-    data = re.sub(r"<center>|</center>","",data)
+    data = unicode( data, "iso-8859-1" , errors="replace" ).encode("utf-8")
 
-    #<tr><td class='tam12'><img src='/banderas/es.png' width='30' height='20' /></td><td class='tam12'>2014-10-04</td><td class='tam12'><center><a href='/enlace/534/1/01/1445121/' rel='nofollow' target='_blank' alt=''><img src='/servidores/allmyvideos.jpg' width='80' height='25' /></a></center></td><td class='tam12'><center>Darkgames</center></td><td class='tam12'></td></tr>
+    data = re.sub(r"<center>|</center>|</a>","",data)
+    data = re.sub(r"<td class='tam(\d+)'></td></tr>",r"<td class='tam\1'>SD</td></tr>",data)
 
-    #<tr><td class='tam12'><img src='/banderas/es.png' width='30' height='20' /></td><td class='tam12'>2014-10-04</td><td class='tam12'><a href='/enlace/534/1/01/1444719/' rel='nofollow' target='_blank' alt=''><img src='/servidores/uploaded.jpg' width='80' height='25' /></a></td><td class='tam12'><center>Darkgames</center></td><td class='tam12'>SD</td></tr>
+    '''
+    <tr>
+    <td class='tam*N*'><a href='(*URL*)'*ATTR*>
+    <img src='*PATH*(*IDIOMA*).*EXT*'*ATTR*></td>
+    <td class='tam*N*'>(*FECHA*)</td>
+    <td class='tam*N*'><a href='*URL*'*ATTR*>
+    <img src='*PATH*(*SERVIDOR*).*EXT*'*ATTR*></td>
+    <td class='tam*N*'><a href='*URL*'*ATTR*>(*UPLOADER*)</td>
+    <td class='tam*N*'>(*SUB|CALIDAD*)</td>
+    </tr>
+    '''
 
-    patron = "<td class='tam12'><img src='/banderas/([^\.]+)\.[^']+'[^>]+></td>"
-    patron+= "<td class='tam12'>([^<]+)</td>"
-    patron+= "<td class='tam12'><a href='([^']+)'[^>]+>"
-    patron+= "<img src='/servidores/([^\.]+)\.[^']+'[^>]+></a></td>"
-    patron+= "<td class='tam12'>[^<]+</td>"
-    patron+= "<td class='tam12'>([^<]+)</td>"
+    online = scrapertools.get_match(data,"<thead><tbody>(.*?)<table class='zebra'>")
+    download = scrapertools.get_match(data,"<caption class='tam16'>Descarga.*?<thead><tbody>(.*?)</tbody></table>")
+
+    online = re.sub(
+        r"<tr>" + \
+         "<td class='tam12'><a href='([^']+)'[^>]+>" + \
+         "<img src='/banderas/([^\.]+)\.[^>]+></td>" + \
+         "<td class='tam12'>([^<]+)</td>" + \
+         "<td class='tam12'><[^>]+>" + \
+         "<img src='/servidores/([^\.]+)\.[^>]+></td>" + \
+         "<td class='tam12'><[^>]+>([^<]+)</td>" + \
+         "<td class='tam12'>([^<]+)</td>" + \
+         "</tr>",
+        r"<patron>\1;\2;\3;\4;\5;\6;Ver</patron>",
+        online
+    )
+    download = re.sub(
+        r"<tr>" + \
+         "<td class='tam12'><a href='([^']+)'[^>]+>" + \
+         "<img src='/banderas/([^\.]+)\.[^>]+></td>" + \
+         "<td class='tam12'>([^<]+)</td>" + \
+         "<td class='tam12'><[^>]+>" + \
+         "<img src='/servidores/([^\.]+)\.[^>]+></td>" + \
+         "<td class='tam12'><[^>]+>([^<]+)</td>" + \
+         "<td class='tam12'>([^<]+)</td>" + \
+         "</tr>",
+        r"<patron>\1;\2;\3;\4;\5;\6;Descargar</patron>",
+        download
+    )
+
+    data = online+download
+
+    '''
+    <patron>*URL*;*IDIOMA*;*FECHA*;*SERVIDOR*;*UPLOADER*;*SUB|CALIDAD*;*TIPO*</patron>
+    '''
+
+    patron = '<patron>([^;]+);([^;]+);([^;]+);([^;]+);([^;]+);([^;]+);([^<]+)</patron>'
+
     matches = re.compile(patron,re.DOTALL).findall(data)
 
-    for scrapedidioma, scrapedfecha, scrapedurl, scrapedservidor, scrapedcalidad in matches:
-        title = "Ver en " + scrapedservidor + " [" + idiomas[scrapedidioma] + "] [" + scrapedcalidad + "] (" + scrapedfecha + ")"
+    for scrapedurl, scrapedidioma, scrapedfecha, scrapedservidor, scrapeduploader, scrapedsubcalidad, scrapedtipo in matches:
+        title = scrapedtipo + " en " + scrapedservidor + " [" + idiomas[scrapedidioma] + "] [" + scrapedsubcalidad + "] (" + scrapeduploader + ": "+ scrapedfecha + ")"
         itemlist.append( Item(channel=__channel__, title =title , url=urlparse.urljoin(host,scrapedurl), action="play", show=item.show) )
 
     return itemlist
