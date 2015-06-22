@@ -13,6 +13,10 @@ from core import scrapertools
 from core import jsontools
 from core.item import Item
 from servers import servertools
+try:
+    import xbmc
+    import xbmcgui
+except: pass
 
 __channel__ = "seriesmu"
 __category__ = "F,S,D"
@@ -42,21 +46,26 @@ def mainlist(item):
     logger.info("pelisalacarta.seriesmu mainlist")
     itemlist = []
     title ="Habilita tu cuenta en la configuración..."
+    title = title.replace(title,bbcode_kodi2html("[COLOR greenyellow]"+title+"[/COLOR]"))
     if config.get_setting("seriesmuaccount")!="true":
         itemlist.append( Item( channel=__channel__ , title=title , action="openconfig" , url="" , fanart="http://s17.postimg.org/6d3kggvvj/smfanlog.jpg", thumbnail="http://s2.postimg.org/c678law6x/smloglog.jpg",  folder=False ) )
     else:
         login()
         title ="Mis Series"
+        title = title.replace(title,bbcode_kodi2html("[COLOR aqua][B]"+title+"[/B][/COLOR]"))
         
         itemlist.append( Item(channel=__channel__, title=title      , action="mis_series", url="http://series.mu/catalogo/mis-series/1/", fanart="http://s27.postimg.org/agsoe4jir/smumsfan.jpg", thumbnail= "https://cdn4.iconfinder.com/data/icons/sabre/snow_sabre_black/512/folder_black_library.png"))
         title ="Series"
+        title = title.replace(title,bbcode_kodi2html("[COLOR aqua][B]"+title+"[/B][/COLOR]"))
         
         itemlist.append( Item(channel=__channel__, title=title      , action="catalogo", url="http://series.mu/catalogo/series/1/", fanart="http://s12.postimg.org/eh5r2oefh/smsfan.jpg", thumbnail="https://lh3.googleusercontent.com/-eSiNj7X0wQU/AAAAAAAAAAI/AAAAAAAAAEM/iolph9ldX5w/photo.jpg"))
         title ="Peliculas"
+        title = title.replace(title,bbcode_kodi2html("[COLOR aqua][B]"+title+"[/B][/COLOR]"))
         
         itemlist.append( Item(channel=__channel__, title=title     , action="catalogo", url="http://series.mu/catalogo/pelis/1/", fanart="http://s7.postimg.org/ybxhxdc0r/smpfan.jpg", thumbnail="http://cdn.flaticon.com/png/256/24949.png"))
        
         title ="Buscar..."
+        title = title.replace(title,bbcode_kodi2html("[COLOR aqua][B]"+title+"[/B][/COLOR]"))
         
         itemlist.append( Item(channel=__channel__, title=title      , action="search", url="http://series.mu/search/", fanart="http://s7.postimg.org/9be35fm6z/smbfan.jpg", thumbnail="http://cdn.mysitemyway.com/etc-mysitemyway/icons/legacy-previews/icons/black-ink-grunge-stamps-textures-icons-people-things/060097-black-ink-grunge-stamp-textures-icon-people-things-eye6.png"))
     
@@ -67,6 +76,21 @@ def openconfig(item):
     if "xbmc" in config.get_platform() or "boxee" in config.get_platform():
         config.open_settings( )
     return []
+def bbcode_kodi2html(text):
+    
+    if config.get_platform().startswith("plex") or config.get_platform().startswith("mediaserver"):
+        import re
+        text = re.sub(r'\[COLOR\s([^\]]+)\]',
+                      r'<span style="color: \1">',
+                      text)
+        text = text.replace('[/COLOR]','</span>')
+        text = text.replace('[CR]','<br>')
+        text = text.replace('[B]','<b>')
+        text = text.replace('[/B]','</b>')
+        text = text.replace('"color: yellow"','"color: gold"')
+        text = text.replace('"color: white"','"color: auto"')
+    
+    return text
 
 
 def search(item,texto):
@@ -105,17 +129,18 @@ def buscador(item, ):
     
     matches = re.compile(patron,re.DOTALL).findall(data)
     scrapertools.printMatches(matches)
-    
+    if len(matches) == 0:
+        itemlist.append( Item(channel=__channel__, title =bbcode_kodi2html("[COLOR skyblue][B]Sin resultados...[/B][/COLOR]"),fanart="http://s6.postimg.org/oy1rj72oh/pdknoisefan.jpg", thumbnail="http://s6.postimg.org/6kplh7brl/smnotallowed.png", folder=False ) )
     
     for scrapedurl, scrapedthumbnail, scrapedtitle in matches:
         scrapedurl = urlparse.urljoin(host, scrapedurl)
         if "series" in scrapedurl:
-            action= "temporadas"
+            action= "episodios"
             
         if "peli" in scrapedurl:
                 action="peliculas"
     
-        itemlist.append( Item(channel=__channel__, title =scrapedtitle , url=scrapedurl, action=action, thumbnail= scrapedthumbnail, fanart="http://s21.postimg.org/gmwquc5hz/smfan2.jpg", folder=True) )
+        itemlist.append( Item(channel=__channel__, title =scrapedtitle , url=scrapedurl, action=action, thumbnail= scrapedthumbnail, fanart="http://s21.postimg.org/gmwquc5hz/smfan2.jpg", show=scrapedtitle, folder=True) )
 
     return itemlist
 
@@ -137,8 +162,9 @@ def mis_series(item):
 
     for scrapedurl, scrapedthumbnail, scrapedtitle in matches:
         scrapedurl = urlparse.urljoin(host, scrapedurl)
+        title = scrapedtitle.replace(scrapedtitle,bbcode_kodi2html("[COLOR sandybrown][B]"+scrapedtitle+"[/B][/COLOR]"))
         
-        itemlist.append( Item(channel=__channel__, title =scrapedtitle , url=scrapedurl, action="temporadas", thumbnail=scrapedthumbnail, fanart="http://s21.postimg.org/gmwquc5hz/smfan2.jpg", folder=True) )
+        itemlist.append( Item(channel=__channel__, title =title , url=scrapedurl, action="episodios", thumbnail=scrapedthumbnail, fanart="http://s21.postimg.org/gmwquc5hz/smfan2.jpg", show=scrapedtitle,category = "mis_series", folder=True) )
 
     return itemlist
 
@@ -167,21 +193,23 @@ def catalogo(item):
     
 
         for scrapedurl, scrapedthumbnail, scrapedtitle, scrapedinfo in matches:
-            title = scrapedtitle +  " (" + scrapedinfo + ")"
+            scrapedinfo = scrapedinfo.replace(scrapedinfo,bbcode_kodi2html("[COLOR gold]"+scrapedinfo+"[/COLOR]"))
+            title = scrapedtitle.replace(scrapedtitle,bbcode_kodi2html("[COLOR white]"+scrapedtitle+"[/COLOR]"))
+            title = title +  " (" + scrapedinfo + ")"
             scrapedurl = urlparse.urljoin(host, scrapedurl)
             if "series" in scrapedurl:
-                action= "temporadas"
+                action= "episodios"
             
             if "peli" in scrapedurl:
                 action="peliculas"
         
         
-            itemlist.append( Item(channel=__channel__, title =title , url=scrapedurl, action=action, thumbnail=scrapedthumbnail, fanart="http://s21.postimg.org/gmwquc5hz/smfan2.jpg", folder=True) )
+            itemlist.append( Item(channel=__channel__, title =title , url=scrapedurl, action=action, thumbnail=scrapedthumbnail, fanart="http://s21.postimg.org/gmwquc5hz/smfan2.jpg", show=scrapedtitle, folder=True) )
     ## Paginación
     try:
         next_page = scrapertools.get_match(data,'<a href="([^"]+)">Siguiente &rsaquo;</a></li></ul></div></div></div>')
         next_page = urlparse.urljoin(host, next_page)
-        title= ">> Página siguiente"
+        title= bbcode_kodi2html("[COLOR blue]>> Página siguiente[/COLOR]")
         itemlist.append( Item(channel=__channel__, title=title, url=next_page, action="catalogo" , fanart="http://s21.postimg.org/gmwquc5hz/smfan2.jpg", thumbnail="http://s21.postimg.org/pro3rcu6v/smarrow.jpg", folder=True) )
     except: pass
    
@@ -204,32 +232,41 @@ def peliculas(item):
 
     matches = re.compile(patron,re.DOTALL).findall(data)
     scrapertools.printMatches(matches)
+    if len(matches) == 0:
+        itemlist.append( Item(channel=__channel__, title =bbcode_kodi2html("[COLOR skyblue][B]No hay enlaces...[/B][/COLOR]"),fanart="http://s6.postimg.org/oy1rj72oh/pdknoisefan.jpg", thumbnail="http://s6.postimg.org/6kplh7brl/smnotallowed.png", folder=False ) )
 
     for scrapedurl, scrapedhost, scrapedaudio, scrapedcalidad in matches:
         scrapedhost= scrapedhost.replace("net","")
         scrapedhost= scrapedhost.replace("eu","")
         scrapedhost= scrapedhost.replace("sx","")
         puntuacion = scrapertools.get_match(data,'<li><div class="num" id="val-score">(.*?)</div>')
+        puntuacion = puntuacion.replace(puntuacion,bbcode_kodi2html("[COLOR yellow]"+puntuacion+"[/COLOR]"))
         puntuacion_title = "Puntuación :"
-        puntuacion = puntuacion_title + " " + puntuacion + "\n"
+        puntuacion_title = puntuacion_title.replace(puntuacion_title,bbcode_kodi2html("[COLOR pink]"+puntuacion_title+"[/COLOR]"))
+        puntuacion = puntuacion_title + " " + puntuacion + "[CR]"
         scrapedplot = scrapertools.get_match(data,'<h2>(.*?)<div class="card media-chapters">')
         plotformat = re.compile('<p>(.*?)</p>',re.DOTALL).findall(scrapedplot)
+        scrapedplot = scrapedplot.replace(scrapedplot,bbcode_kodi2html("[COLOR white]"+scrapedplot+"[/COLOR]"))
         for plot in plotformat:
-            scrapedplot = scrapedplot.replace("</h2><p>","\n")
+            scrapedplot = scrapedplot.replace(plot,bbcode_kodi2html("[COLOR skyblue][B]"+plot+"[/B][/COLOR]"))
+            scrapedplot = scrapedplot.replace("</h2><p>","[CR]")
             scrapedplot = scrapedplot.replace("</p></div>","")
         scrapedplot = puntuacion + scrapedplot
+        scrapedhost = scrapedhost.replace(scrapedhost,bbcode_kodi2html("[COLOR burlywood]"+scrapedhost+"[/COLOR]"))
+        scrapedaudio = scrapedaudio.replace(scrapedaudio,bbcode_kodi2html("[COLOR white]"+scrapedaudio+"[/COLOR]"))
+        scrapedcalidad = scrapedcalidad.replace(scrapedcalidad,bbcode_kodi2html("[COLOR olive]"+scrapedcalidad+"[/COLOR]"))
         fanart = scrapertools.get_match(data,'<div class="media-cover" style="background-image: url\(http://series.mu([^"]+)\)')
         fanart = urlparse.urljoin(host, fanart)
         
         title = scrapedhost + "--" + scrapedaudio + "--" + scrapedcalidad
-        itemlist.append( Item(channel=__channel__, action="play", title= title  , url=scrapedurl , thumbnail=item.thumbnail , plot=scrapedplot, fanart=fanart, folder=True) )
+        itemlist.append( Item(channel=__channel__, action="play", title= title  , url=scrapedurl , thumbnail=item.thumbnail ,show=item.show, plot=scrapedplot, fanart=fanart, folder=True) )
 
 
     return itemlist
 
 
-def temporadas(item):
-    logger.info("pelisalacarta.seriesmu temporadas")
+def episodios(item):
+    logger.info("pelisalacarta.seriesmu episodios")
     itemlist = []
     
     
@@ -237,37 +274,31 @@ def temporadas(item):
     data = scrapertools.cache_page(item.url)
     data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;","",data)
     
+    
     seguir = scrapertools.get_match(data,'<ul><li text="Siguiendo" color="green" class="([^"]+)"')
     abandonar = scrapertools.get_match(data,'<li text="Abandonada" color="red" class="([^"]+)">')
+
     fanart = scrapertools.get_match(data,'<div class="media-cover" style="background-image: url\(http://series.mu([^"]+)\)')
     fanart = urlparse.urljoin(host, fanart)
     seguir = urlparse.urljoin(host, seguir)
     abandonar = urlparse.urljoin(host, abandonar)
    
-    if '<div class=""></div>' in data:
-        action="seguir"
-        title= "Seguir"
-        thumbnail= "http://s14.postimg.org/ca5boj275/smseguir.png"
-
-
-    else:
-        action="siguiendo"
-        title= "Siguiendo"
-        thumbnail="http://s28.postimg.org/ugtnbj6z1/smsiguiendo2.png"
+    if not item.title.endswith("XBMC"):
+        if '<div class=""></div>' in data:
+           url = seguir
+           title = bbcode_kodi2html("[COLOR yellow]Seguir[/COLOR]")
+           thumbnail= "http://s14.postimg.org/ca5boj275/smseguir.png"
+        else:
+            url = abandonar
+            title = bbcode_kodi2html("[COLOR green]Siguiendo[/COLOR]: [COLOR red]Abandonar[/COLOR]")
+            thumbnail="http://s18.postimg.org/hh4l8hj1l/smabandonar2.png"
     
-    itemlist.append( Item(channel=item.channel, title=title, url=seguir, fanart=fanart, thumbnail=thumbnail, action=action))
-
-    if '<div class="green">' in data:
-        
-        action="abandono"
-        title= "Abandonar"
-
-        itemlist.append( Item(channel=item.channel, title=title, url=abandonar, fanart=fanart, thumbnail="http://s18.postimg.org/hh4l8hj1l/smabandonar2.png", action=action))
+        itemlist.append( Item(channel=item.channel, title=title, url=url, fanart=fanart, thumbnail=thumbnail, action="cambiar_estado", extra=item.url, folder=False))
 
 
 
 
-    patrontemporada = '<ul (temp[^<]+)>(.*?)>Marcar como vista</a>'
+    patrontemporada = '<ul (temp[^<]+)>(.*?)</ul>'
     matchestemporadas = re.compile(patrontemporada,re.DOTALL).findall(data)
     
     for nombre_temporada,bloque_episodios in matchestemporadas:
@@ -289,76 +320,95 @@ def temporadas(item):
         for scrapednumber, scrapedtitle, scrapedeyes, scrapedurl in matches:
         
             if "open" in scrapedeyes:
-               scrapedeyes = re.sub(r"eye-w icon-eye-open"," [Visto]",scrapedeyes)
+               scrapedeyes = re.sub(r"eye-w icon-eye-open",bbcode_kodi2html("[COLOR salmon]"+" [Visto]"+"[/COLOR]"),scrapedeyes)
             if "close" in scrapedeyes:
-               scrapedeyes = re.sub(r"eye-w icon-eye-close"," [Pendiente]",scrapedeyes)
-            scrapedtitle = nombre_temporada + "X" + scrapednumber + scrapedtitle + scrapedeyes
-            scrapedtitle = scrapedtitle.replace("="," ")
-            scrapedtitle = scrapedtitle.replace("temp","Temporada")
+               scrapedeyes = re.sub(r"eye-w icon-eye-close",bbcode_kodi2html("[COLOR chartreuse]"+" [Pendiente]"+"[/COLOR]"),scrapedeyes)
+           
+            title = nombre_temporada + "X" + scrapednumber + scrapedtitle + scrapedeyes
+            title = title.replace("temp=","Temporada ")
+            title = title.replace(scrapedtitle,bbcode_kodi2html("[COLOR white]"+scrapedtitle+"[/COLOR]"))
             puntuacion = scrapertools.get_match(data,'<li><div class="num" id="val-score">(.*?)</div>')
+            puntuacion = puntuacion.replace(puntuacion,bbcode_kodi2html("[COLOR yellow]"+puntuacion+"[/COLOR]"))
             puntuacion_title = "Puntuación :"
-            puntuacion = puntuacion_title + " " + puntuacion + "\n"
+            puntuacion_title = puntuacion_title.replace(puntuacion_title,bbcode_kodi2html("[COLOR pink]"+puntuacion_title+"[/COLOR]"))
+            puntuacion = puntuacion_title + " " + puntuacion + "[CR]"
             scrapedplot = scrapertools.get_match(data,'<h2>(.*?)<div class="card media-chapters">')
             plotformat = re.compile('<p>(.*?)</p>',re.DOTALL).findall(scrapedplot)
+            scrapedplot = scrapedplot.replace(scrapedplot,bbcode_kodi2html("[COLOR white]"+scrapedplot+"[/COLOR]"))
             for plot in plotformat:
-               scrapedplot = scrapedplot.replace("</h2><p>","\n")
+                scrapedplot = scrapedplot.replace(plot,bbcode_kodi2html("[COLOR skyblue][B]"+plot+"[/B][/COLOR]"))
+                scrapedplot = scrapedplot.replace("</h2><p>","[CR]")
                 scrapedplot = scrapedplot.replace("</p></div>","")
             scrapedplot = puntuacion + scrapedplot
             fanart = scrapertools.get_match(data,'<div class="media-cover" style="background-image: url\(http://series.mu([^"]+)\)')
             fanart = urlparse.urljoin(host, fanart)
             scrapedurl = urlparse.urljoin(host, scrapedurl)
         
-            itemlist.append( Item(channel=__channel__, title =scrapedtitle , url=scrapedurl, action="findvideos", thumbnail=item.thumbnail, plot=scrapedplot, fanart=fanart, folder=True) )
+            if scrapedtitle != " ": itemlist.append( Item(channel=__channel__, title =title , url=scrapedurl, action="findvideos", thumbnail=item.thumbnail, plot=scrapedplot, fanart=fanart, show=item.show.strip(), folder=True) )
+    if (config.get_platform().startswith("xbmc") or config.get_platform().startswith("boxee")) and len(itemlist)>0:
+       itemlist.append( Item(channel=__channel__, title="Añadir esta serie a la biblioteca de XBMC", url=item.url, action="add_serie_to_library", extra="episodios", show=item.show) )
+    
+
+
+
+    
+    
+
+    
+    return itemlist
+
+def cambiar_estado(item):
+    logger.info("pelisalacarta.seriesmu cambiar_estado")
+    
+    ## Solicitar Seguir
+    data = scrapertools.cache_page(item.url)
+
+
+
+    if  "Seguir" in item.title:
+        fanart= "http://s6.postimg.org/mchq3cdsh/Siguendomax.png"
+        thumbnail ="http://s6.postimg.org/qbqvlwatp/mu2.png"
+    
+    else:
+        fanart= "http://s6.postimg.org/ssqotfmc1/abandonadamax.png"
+        thumbnail ="http://s6.postimg.org/7i52owclp/image.png"
+    ventana = TextBox2(fanart=fanart, thumbnail=thumbnail)
+    
+    if item.category == "mis_series":
+        xbmc.executebuiltin( "XBMC.Action(back)" )
+        xbmc.executebuiltin( "Container.Refresh" )
+    else:
+        ## Kodi: Refrescar contenedor
+        xbmc.executebuiltin( "Container.Refresh" )
+        ## Restaurar la url de la serie
+        item.url = item.extra
+        return episodios(item)
+try:
+    class TextBox2( xbmcgui.WindowDialog ):
+            """ Create a skinned textbox window """
+            def __init__( self, *args, **kwargs):
+                self.getFanart = kwargs.get('fanart')
+                self.getThumbnail = kwargs.get('thumbnail')
+            
+                self.background = xbmcgui.ControlImage( 330, 30, 600 , 230, 'http://s6.postimg.org/4ub10su6p/ventanucosm.png')
+                self.fanart = xbmcgui.ControlImage( 370, 80, 260, 50, self.getFanart )
+                self.thumbnail = xbmcgui.ControlImage( 665, 50, 220, 200, self.getThumbnail )
+            
+            
+                self.addControl(self.background)
+                self.addControl(self.fanart)
+                self.addControl(self.thumbnail)
         
+        
+        
+                self.show(self)
+                import time
+                time.sleep(3)
+                self.close(self)
+except: pass
 
 
 
-    
-    
-
-    
-    return itemlist
-
-
-
-def seguir(item):
-    logger.info("pelisalacarta.seriesmu seguir")
-    
-    itemlist = []
-    # Descarga la pagina
-    data = scrapertools.cache_page(item.url)
-    data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;","",data)
-    if "status" in item.url:
-        title= "Siguiendo!!"
-        itemlist.append( Item(channel=__channel__, title= title,  fanart=item.fanart, thumbnail="http://s9.postimg.org/vc0l27qgf/smyasigue.png", folder=False) )
-
-    return itemlist
-
-def siguiendo(item):
-    logger.info("pelisalacarta.seriesmu siguiendo")
-    
-    itemlist = []
-    # Descarga la pagina
-    data = scrapertools.cache_page(item.url)
-    data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;","",data)
-    if "status" in item.url:
-        title= "Ya sigues esta serie..."
-        itemlist.append( Item(channel=__channel__, title= title, fanart=item.fanart, thumbnail="http://s12.postimg.org/ms7q9hj4d/smnotallowed.png", folder=False) )
-    
-    return itemlist
-
-def abandono(item):
-    logger.info("pelisalacarta.seriesmu siguiendo")
-    
-    itemlist = []
-    # Descarga la pagina
-    data = scrapertools.cache_page(item.url)
-    data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;","",data)
-    if "status" in item.url:
-        title= "Abandonada..."
-        itemlist.append( Item(channel=__channel__, title= title, fanart=item.fanart, thumbnail="http://www.clker.com/cliparts/2/l/m/p/B/b/error-hi.png", folder=False) )
-    
-    return itemlist
 
 
 
@@ -390,11 +440,17 @@ def findvideos(item):
     
         matches = re.compile(patron,re.DOTALL).findall(data)
         scrapertools.printMatches(matches)
+        if len(matches) == 0:
+           itemlist.append( Item(channel=__channel__, title =bbcode_kodi2html("[COLOR skyblue][B]No hay enlaces...[/B][/COLOR]"),fanart="http://s6.postimg.org/oy1rj72oh/pdknoisefan.jpg", thumbnail="http://s6.postimg.org/6kplh7brl/smnotallowed.png", folder=False ) )
+        
 
         for scrapedurl, scrapedhost, scrapedaudio, scrapedcalidad in matches:
             scrapedhost= scrapedhost.replace("net","")
             scrapedhost= scrapedhost.replace("eu","")
             scrapedhost= scrapedhost.replace("sx","")
+            scrapedhost = scrapedhost.replace(scrapedhost,bbcode_kodi2html("[COLOR burlywood]"+scrapedhost+"[/COLOR]"))
+            scrapedaudio = scrapedaudio.replace(scrapedaudio,bbcode_kodi2html("[COLOR white]"+scrapedaudio+"[/COLOR]"))
+            scrapedcalidad = scrapedcalidad.replace(scrapedcalidad,bbcode_kodi2html("[COLOR olive]"+scrapedcalidad+"[/COLOR]"))
             scrapedurl = urlparse.urljoin(host, scrapedurl)
             
             title = scrapedhost + "--" + scrapedaudio + "--" + scrapedcalidad
@@ -414,13 +470,17 @@ def findvideos(item):
 def play(item):
     logger.info("pelisalacarta.seriesmu play")
 
-    media_url = scrapertools.get_header_from_response(item.url,header_to_get="location")
+    media_url = scrapertools.get_header_from_response(item.url,header_to_get="Location")
     itemlist = servertools.find_video_items(data=media_url)
 
     if len(itemlist) == 0:
         itemlist = servertools.find_video_items(data=item.url)
-
+    
+    
+        
     return itemlist
+
+
 
 
 
