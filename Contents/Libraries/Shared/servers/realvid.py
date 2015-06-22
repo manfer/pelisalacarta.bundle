@@ -19,6 +19,8 @@ def test_video_exists( page_url ):
 
 def get_video_url( page_url , premium = False , user="" , password="", video_password="" ):
     logger.info("[realvid.py] url="+page_url)
+    if not "embed" in page_url:
+      page_url = page_url.replace("http://realvid.net/","http://realvid.net/embed-") + ".html"
     data = scrapertools.cache_page( page_url )
     media_url = scrapertools.get_match(data,'file: "([^"]+)",')
     video_urls = []
@@ -45,7 +47,20 @@ def find_videos(data):
             encontrados.add(url)
         else:
             logger.info("  url duplicada="+url)
+            
+    patronvideos  = 'http://realvid.net/([a-z0-9A-Z]+)'
+    logger.info("[realvid.py] find_videos #"+patronvideos+"#")
+    matches = re.compile(patronvideos,re.DOTALL).findall(data)
 
+    for match in matches:
+        titulo = "[realvid]"
+        url = "http://realvid.net/embed-"+match+".html"
+        if url not in encontrados:
+            logger.info("  url="+url)
+            devuelve.append( [ titulo , url , 'realvid' ] )
+            encontrados.add(url)
+        else:
+            logger.info("  url duplicada="+url)
     return devuelve
 
 def test():
