@@ -14,6 +14,7 @@ import urllib
 
 DEBUG = config.get_setting("debug")
 
+
 def get_server_list():
     servers =[]
     data = scrapertools.downloadpage("http://longurl.org/services")
@@ -28,19 +29,23 @@ def get_server_list():
     for server in matches:
       servers.append(server)
     return servers
+
+servers=get_server_list()
+
     
 def get_long_urls(data):
     logger.info("[longurl.py] get_long_urls ")  
     patron  = '<a href="http://([^"]+)"'
     matches = re.compile(patron,re.DOTALL).findall(data)
     for short_url in matches:
-      if short_url.startswith(tuple(get_server_list())):
-        short_url="http://"+short_url
-        logger.info(short_url)
-        longurl_data = scrapertools.downloadpage("http://longurl.org/expand?url="+urllib.quote_plus(short_url))
-        if DEBUG: logger.info(longurl_data)
-        longurl_data = scrapertools.get_match(longurl_data,'<dt>Long URL:</dt>(.*?)</dd>')
-        long_url = scrapertools.get_match(longurl_data,'<a href="(.*?)">')
+      if short_url.startswith(tuple(servers)):
+        logger.info("[longurl.py] - get_long_urls: " + short_url)
+        longurl_data = scrapertools.downloadpage("http://api.longurl.org/v2/expand?url="+urllib.quote_plus(short_url))
+        logger.info(longurl_data)
+        try:
+          long_url = scrapertools.get_match(longurl_data,'<long-url><!\[CDATA\[(.*?)\]\]></long-url>')
+        except:
+          long_url=""
         if (long_url<> ""):data=data.replace(short_url,long_url)
     return data
 
