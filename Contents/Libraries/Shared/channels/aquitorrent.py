@@ -51,10 +51,10 @@ def mainlist(item):
 def search(item,texto):
     logger.info("[pelisalacarta.aquitorrent search texto="+texto)
     
-    item.url = "http://www.aquitorrent.com/buscar.asp?pagina=1&buscar=%s" % (texto)
+    item.url = "http://www.aquitorrent.com/buscar.asp?q=%s" % (texto)
     try:
         
-        return peliculas(item)
+        return buscador(item)
     # Se captura la excepción, para no interrumpir al buscador global si un canal falla
     except:
         import sys
@@ -63,6 +63,48 @@ def search(item,texto):
         return []
 
 
+def buscador(item):
+    logger.info("pelisalacarta.aquitorrent buscador")
+    
+    itemlist = []
+    
+    # Descarga la página
+    data = scrapertools.cache_page(item.url)
+    data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;","",data)
+    #quitamos los titulos de los href en enlaces<
+    data = re.sub(r'&/[^"]+">','">',data)
+
+    patron = '<h2 class="post-title entry-title">.*?'
+    patron += '<a href=".([^"]+)".*?>'
+    patron += '([^<]+)</a>.*?'
+    patron += '<img src="([^"]+)".*?'
+    patron += '<b>([^"]+)</b>'
+    
+    
+    
+    matches = re.compile(patron,re.DOTALL).findall(data)
+    scrapertools.printMatches(matches)
+    if len(matches)==0 :
+        itemlist.append( Item(channel=__channel__, title="[COLOR gold][B]No hay resultados...[/B][/COLOR]", thumbnail ="http://s6.postimg.org/t48ttay4x/aquitnoisethumb.png", fanart ="http://s6.postimg.org/4wjnb0ksx/aquitonoisefan.jpg",folder=False) )
+    
+    
+    for scrapedurl, scrapedtitle, scrapedthumbnail, scrapedinfo in matches:
+        scrapedinfo = scrapedinfo.replace("<br>","-")
+        scrapedinfo = scrapedinfo.replace(scrapedinfo,"[COLOR green]"+scrapedinfo+"[/COLOR]")
+        scrapedtitle= scrapedtitle.replace(scrapedtitle,"[COLOR white]"+scrapedtitle+"[/COLOR]")
+        scrapedtitle = scrapedtitle + " (" + scrapedinfo + ")"
+        # Arregla la url y thumbnail
+        #scrapedurl = fix_url(scrapedurl)
+        scrapedthumbnail = fix_url(scrapedthumbnail)
+        
+        
+        if "tipo=Docus" in item.url or "tipo=F1" in item.url or "tipo=MotoGP" in item.url or "tipo=Mundia" in item.url:
+            action= "findvideos"
+        else:
+            action = "fanart"
+        itemlist.append( Item(channel=__channel__, title =scrapedtitle , url= urlparse.urljoin(host, scrapedurl), action=action, fanart="http://s9.postimg.org/lmwhrdl7z/aquitfanart.jpg", thumbnail=scrapedthumbnail) )
+
+    return itemlist
 
 
 def peliculas(item):
@@ -76,19 +118,24 @@ def peliculas(item):
     #quitamos los titulos de los href en enlaces<
     data = re.sub(r'&/[^"]+">','">',data)
     
-    patron = '<div class="div_pic" align="center">'
-    patron += '<a href="([^"]+)".*?>'
-    patron += '<img src="([^"]+)".*?'
-    patron += 'alt="([^"]+)"'
     
+    patron = '<div class="sompret-image">'
+    patron += '<a href=".([^"]+)".*?>'
+    patron += '<img src="([^"]+)".*?'
+    patron += 'title="(.*?) -.*?'
+    patron += '<b>([^"]+)</b>'
 
     matches = re.compile(patron,re.DOTALL).findall(data)
     scrapertools.printMatches(matches)
     if len(matches)==0 :
-        itemlist.append( Item(channel=__channel__, title="No hay resultados...", thumbnail ="http://s6.postimg.org/t48ttay4x/aquitnoisethumb.png", fanart ="http://s6.postimg.org/4wjnb0ksx/aquitonoisefan.jpg",folder=False) )
+        itemlist.append( Item(channel=__channel__, title="[COLOR gold][B]No hay resultados...[/B][/COLOR]", thumbnail ="http://s6.postimg.org/t48ttay4x/aquitnoisethumb.png", fanart ="http://s6.postimg.org/4wjnb0ksx/aquitonoisefan.jpg",folder=False) )
     
    
-    for scrapedurl, scrapedthumbnail, scrapedtitle in matches:
+    for scrapedurl, scrapedthumbnail, scrapedtitle, scrapedinfo in matches:
+        scrapedinfo = scrapedinfo.replace("<br>","-")
+        scrapedinfo = scrapedinfo.replace(scrapedinfo,"[COLOR green]"+scrapedinfo+"[/COLOR]")
+        scrapedtitle= scrapedtitle.replace(scrapedtitle,"[COLOR white]"+scrapedtitle+"[/COLOR]")
+        scrapedtitle = scrapedtitle + " (" + scrapedinfo + ")"
         # Arregla la url y thumbnail
         #scrapedurl = fix_url(scrapedurl)
         scrapedthumbnail = fix_url(scrapedthumbnail)
@@ -97,13 +144,13 @@ def peliculas(item):
             action= "findvideos"
         else:
             action = "fanart"
-        itemlist.append( Item(channel=__channel__, title =scrapedtitle , url=scrapedurl, action=action, fanart="http://s9.postimg.org/lmwhrdl7z/aquitfanart.jpg", thumbnail=scrapedthumbnail) )
+        itemlist.append( Item(channel=__channel__, title =scrapedtitle , url=urlparse.urljoin(host, scrapedurl), action=action, fanart="http://s9.postimg.org/lmwhrdl7z/aquitfanart.jpg", thumbnail=scrapedthumbnail) )
 
     ## Paginación
     pagina = int(scrapertools.get_match(item.url,"pagina=(\d+)"))+1
     pagina = "pagina=%s" % (pagina)
     next_page = re.sub(r"pagina=\d+", pagina, item.url)
-    title= "Pagina siguiente>>"
+    title= "[COLOR green]Pagina siguiente>>[/COLOR]"
     if pagina in data:
         itemlist.append( Item(channel=__channel__, title=title, url=next_page, fanart="http://s9.postimg.org/lmwhrdl7z/aquitfanart.jpg", thumbnail="http://s6.postimg.org/4hpbrb13l/texflecha2.png",
             action="peliculas", folder=True) )
@@ -119,7 +166,7 @@ def fanart(item):
     data = scrapertools.cachePage(url)
     data = re.sub(r"\n|\r|\t|\s{2}|\(.*?\)|&nbsp;","",data)
     if "PELICULAS" in item.url:
-        title= scrapertools.get_match(data,'<td class="wrapper_pic_td">.*?alt="([^"]+)"')
+        title= scrapertools.get_match(data,'<title>Descarga (.*?)-')
         title= re.sub(r"3D|SBS|-|V.S.O.|VOS|","",title)
         title= title.replace(' ','%20')
         url="http://api.themoviedb.org/3/search/movie?api_key=57983e31fb435df4df77afb854740ea9&query=" + title + "&language=es&include_adult=false"
@@ -136,7 +183,7 @@ def fanart(item):
                 itemlist.append( Item(channel=__channel__, title =item.title, url=item.url, action="findvideos", thumbnail=item.thumbnail, fanart=item.extra , folder=True) )
                 
     elif "Peliculas" in item.url:
-          title= scrapertools.get_match(data,'<td class="wrapper_pic_td">.*?alt="([^"]+)"')
+          title= scrapertools.get_match(data,'<title>Descarga (.*?)-')
           title= re.sub(r"3D|SBS|-|V.S.O.|VOS|","",title)
           title= title.replace(' ','%20')
           url="http://api.themoviedb.org/3/search/movie?api_key=57983e31fb435df4df77afb854740ea9&query=" + title + "&language=es&include_adult=false"
@@ -152,7 +199,7 @@ def fanart(item):
                   item.extra= fanart
                   itemlist.append( Item(channel=__channel__, title =item.title, url=item.url, action="findvideos", thumbnail=item.thumbnail, fanart=item.extra , folder=True) )
     elif "DISNEY" in item.url:
-        title= scrapertools.get_match(data,'<title>([^"]+) -')
+        title= scrapertools.get_match(data,'<title>Descarga (.*?)-')
         title= re.sub(r"3D|SBS|-|V.S.O.|VOS|","",title)
         title= title.replace(' ','%20')
         url="http://api.themoviedb.org/3/search/movie?api_key=57983e31fb435df4df77afb854740ea9&query=" + title + "&language=es&include_adult=false"
@@ -170,7 +217,7 @@ def fanart(item):
                 itemlist.append( Item(channel=__channel__, title=item.title, url=item.url, action="findvideos", thumbnail=item.thumbnail, fanart=item.extra , folder=True) )
 
     else:
-        title= scrapertools.get_match(data,'<td class="wrapper_pic_td">.*?alt="([^"]+)"')
+        title= scrapertools.get_match(data,'<title>Descarga (.*?)-')
         title= re.sub(r"[0-9]|x|DVB|-|","",title)
         title= title.replace(' ','%20')
         url="http://thetvdb.com/api/GetSeries.php?seriesname=" + title + "&language=es"
@@ -201,6 +248,7 @@ def fanart(item):
                 
                     itemlist.append( Item(channel=__channel__, title =item.title, url=item.url, action="findvideos", thumbnail=item.thumbnail, fanart=item.extra , folder=True) )
     title ="Info"
+    title = title.replace(title,"[COLOR skyblue][B]"+title+"[/B][/COLOR]")
     if len(item.extra)==0:
         fanart=item.thumbnail
     if len(item.extra)>0:
@@ -218,8 +266,7 @@ def findvideos(item):
     data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;","",data)
     
     # Torrent en zip
-    patron = '<td class="wrapper_pic_td">.*? '
-    patron+= 'alt="([^"]+)".*? '
+    patron = '<h1 class="post-title entry-title">([^<]+)</h1>.*?</b><br><br>.*?'
     patron+= 'href="(.*?\.zip)".*?'
     matches = re.compile(patron,re.DOTALL).findall(data)
     if len(matches)>0:
@@ -227,32 +274,29 @@ def findvideos(item):
             # Arregla la url y extrae el torrent
             scrapedtorrent = unzip(fix_url(scrapedzip))
             
-            itemlist.append( Item(channel=__channel__, title =item.title+" [torrent]" , url=scrapedtorrent,  action="play", server="torrent", thumbnail=item.thumbnail, fanart=item.fanart , folder=False) )
+            itemlist.append( Item(channel=__channel__, title =item.title+"[COLOR red][B] [magnet][/B][/COLOR]" , url=scrapedtorrent,  action="play", server="torrent", thumbnail=item.thumbnail, fanart=item.fanart , folder=False) )
 
     #Vamos con el normal
 
-    patron = '<td class="wrapper_pic_td">.*? '
-    patron+= 'alt="([^"]+)".*? '
+    patron = '<h1 class="post-title entry-title">([^<]+)</h1>.*?'
     patron+= 'href="(magnet[^"]+)".*?'
-    patron+= 'title="Visionado Online".*?'
-    patron += '<a href="http://www.bitlet.org/video/play.torrent=([^&]+)&.*?'
+
 
     
     matches = re.compile(patron,re.DOTALL).findall(data)
     
-    for scrapedtitle, scrapedmagnet, scrapedtorrent in matches:
-        itemlist.append( Item(channel=__channel__, title =item.title+" [magnet]" , url=scrapedmagnet,  action="play", server="torrent", thumbnail=item.thumbnail, fanart=item.fanart , folder=False) )
-        itemlist.append( Item(channel=__channel__, title =item.title+" [torrent]" , url=scrapedtorrent,  action="play", server="torrent", thumbnail=item.thumbnail, fanart=item.fanart ,folder=False) )
+    for scrapedtitle, scrapedmagnet in matches:
+        itemlist.append( Item(channel=__channel__, title =item.title+"[COLOR red][B] [magnet][/B][/COLOR]" , url=scrapedmagnet,  action="play", server="torrent", thumbnail=item.thumbnail, fanart=item.fanart , folder=False) )
+    
     #nueva variacion
     if len(itemlist) == 0:
-       patron = '<td class="wrapper_pic_td">.*? '
-       patron+= 'alt="([^"]+)".*? '
+       patron = '<h1 class="post-title entry-title">([^<]+)</h1>.*?<br><br>.*?'
        patron+= 'href="([^"]+)".*?'
        
        matches = re.compile(patron,re.DOTALL).findall(data)
     
        for scrapedtitle, scrapedtorrent in matches:
-           itemlist.append( Item(channel=__channel__, title =scrapedtitle+" [torrent]", url=scrapedtorrent, action="play", server="torrent", thumbnail=item.thumbnail, fanart=item.fanart , folder=False) )
+           itemlist.append( Item(channel=__channel__, title =scrapedtitle+"[COLOR green][B] [magnet][/B][/COLOR]", url=scrapedtorrent, action="play", server="torrent", thumbnail=item.thumbnail, fanart=item.fanart , folder=False) )
 
 
     
@@ -309,13 +353,27 @@ def info(item):
     url=item.url
     data = scrapertools.cachePage(url)
     data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;","",data)
-    title= scrapertools.get_match(data,'<title>([^"]+) -')
+    title= scrapertools.get_match(data,'<h1 class="post-title entry-title">([^<]+)</h1>')
+    title = title.replace(title,"[COLOR aqua][B]"+title+"[/B][/COLOR]")
     
     if "DISNEY" in item.url or "Series" in item.url or "PELICULAS-3D" in item.url or "PELICULAS-VOS" in item.url:
-        scrapedplot = scrapertools.get_match(data,'"2"><br><br>(.*)<br><br><img')
+        scrapedplot = scrapertools.get_match(data,'<span style="text-align: justify;">(.*)</span></div>')
         plotformat = re.compile('(.*?:).*?<br />',re.DOTALL).findall(scrapedplot)
+        # Reemplaza las etiquetas con etiquetas formateadas con color azul y negrita
+        for plot in plotformat:
+            scrapedplot = scrapedplot.replace(plot,"[COLOR green][B]"+plot+"[/B][/COLOR]")
+            plot = plot.replace(plot,"[COLOR white]"+plot+"[/COLOR]")
+        
+        # reemplaza los <br /> por saltos de línea del xbmc
+        scrapedplot = scrapedplot.replace("<br />","[CR]")
         # codifica el texto en utf-8 para que se puedan ver las tíldes y eñes
-        scrapedplot = unicode( scrapedplot, "iso-8859-1" , errors="replace" ).encode("utf-8")
+        scrapedplot= scrapedplot.replace('á','a')
+        scrapedplot= scrapedplot.replace('Á','A')
+        scrapedplot= scrapedplot.replace('é','e')
+        scrapedplot= scrapedplot.replace('í','i')
+        scrapedplot= scrapedplot.replace('ó','o')
+        scrapedplot= scrapedplot.replace('ú','u')
+        scrapedplot= scrapedplot.replace('ñ','n')
         fanart="http://s11.postimg.org/qu66qpjz7/zentorrentsfanart.jpg"
         tbd = TextBox("DialogTextViewer.xml", os.getcwd(), "Default")
         tbd.ask(title, scrapedplot,fanart)
@@ -325,18 +383,42 @@ def info(item):
         if "PELICULAS" in item.url or "peliculas" in item.url:
             scrapedplot = scrapertools.get_match(data,'<br><br>>(.*)<br><br><img')
             plotformat = re.compile('(.*?:).*?<br />',re.DOTALL).findall(scrapedplot)
+            # Reemplaza las etiquetas con etiquetas formateadas con color azul y negrita
+            for plot in plotformat:
+                scrapedplot = scrapedplot.replace(plot,"[COLOR green][B]"+plot+"[/B][/COLOR]")
+                plot = plot.replace(plot,"[COLOR white]"+plot+"[/COLOR]")
+            # reemplaza los <br /> por saltos de línea del xbmc
+            scrapedplot = scrapedplot.replace("<br />","[CR]")
             # codifica el texto en utf-8 para que se puedan ver las tíldes y eñes
-            scrapedplot = unicode( scrapedplot, "iso-8859-1" , errors="replace" ).encode("utf-8")
+            scrapedplot= scrapedplot.replace('á','a')
+            scrapedplot= scrapedplot.replace('Á','A')
+            scrapedplot= scrapedplot.replace('é','e')
+            scrapedplot= scrapedplot.replace('í','i')
+            scrapedplot= scrapedplot.replace('ó','o')
+            scrapedplot= scrapedplot.replace('ú','u')
+            scrapedplot= scrapedplot.replace('ñ','n')
             fanart="http://s11.postimg.org/qu66qpjz7/zentorrentsfanart.jpg"
             tbd = TextBox("DialogTextViewer.xml", os.getcwd(), "Default")
             tbd.ask(title, scrapedplot,fanart)
             del tbd
             return
         else:
-            scrapedplot = scrapertools.get_match(data,'"2"><br><br>(.*)<br><br><img')
+            scrapedplot = scrapertools.get_match(data,'<span style="text-align: justify;">(.*)</span></div>')
             plotformat = re.compile('(.*?:).*?<br />',re.DOTALL).findall(scrapedplot)
+            # Reemplaza las etiquetas con etiquetas formateadas con color azul y negrita
+            for plot in plotformat:
+                scrapedplot = scrapedplot.replace(plot,"[COLOR green][B]"+plot+"[/B][/COLOR]")
+                plot = plot.replace(plot,"[COLOR white]"+plot+"[/COLOR]")
+            # reemplaza los <br /> por saltos de línea del xbmc
+            scrapedplot = scrapedplot.replace("<br />","[CR]")
             # codifica el texto en utf-8 para que se puedan ver las tíldes y eñes
-            scrapedplot = unicode( scrapedplot, "iso-8859-1" , errors="replace" ).encode("utf-8")
+            scrapedplot= scrapedplot.replace('á','a')
+            scrapedplot= scrapedplot.replace('Á','A')
+            scrapedplot= scrapedplot.replace('é','e')
+            scrapedplot= scrapedplot.replace('í','i')
+            scrapedplot= scrapedplot.replace('ó','o')
+            scrapedplot= scrapedplot.replace('ú','u')
+            scrapedplot= scrapedplot.replace('ñ','n')
             fanart="http://s11.postimg.org/qu66qpjz7/zentorrentsfanart.jpg"
             tbd = TextBox("DialogTextViewer.xml", os.getcwd(), "Default")
             tbd.ask(title, scrapedplot,fanart)
@@ -376,3 +458,14 @@ try:
 
 except:
     pass
+
+
+
+
+
+
+
+
+
+
+
