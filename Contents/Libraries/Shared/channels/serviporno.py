@@ -47,7 +47,7 @@ def search(item,texto):
 def videos(item):
     logger.info("[serviporno.py] videos")
     itemlist = []
-    data = scrapertools.downloadpage(item.url)
+    data = scrapertools.cachePage(item.url)
     patron = '<a href="([^"]+)">[^<]{1}<img src="([^"]+)" data-src="[^"]+" alt="[^"]+" id=\'[^"]+\' class="thumbs-changer" data-thumbs-prefix="[^"]+" height="150px" width="175px" border=0 />[^<]{1}</a>[^<]{1}<h4><a href="[^"]+">([^"]+)</a></h4>[^<]{1}'
     matches = re.compile(patron,re.DOTALL).findall(data)
     for url,thumbnail, title  in matches:
@@ -68,7 +68,7 @@ def videos(item):
 def chicas(item):
     logger.info("[serviporno.py] chicas")
     itemlist = []
-    data = scrapertools.downloadpage(item.url)
+    data = scrapertools.cachePage(item.url)
     patron ='<div class="box-chica">[^<]{1}<a href="([^"]+)" title="">[^<]{1}<img class="img" src=\'([^"]+)\' width="175" height="150" border=\'0\' alt="[^"]+"/>[^<]{1}</a>[^<]{1}<h4><a href="[^"]+" title="">([^"]+)</a></h4>[^<]{1}<div class="vistas"><small class="sprite ico-vistas"></small>[^"]+</div>[^<]{1}<a class="total-videos" href="[^"]+" title="">([^"]+)</a>[^<]{1}<div class="clear"></div>'
     matches = re.compile(patron,re.DOTALL).findall(data)
     for url,thumbnail, title, videos  in matches:
@@ -80,7 +80,7 @@ def chicas(item):
 def tags(item):
     logger.info("[serviporno.py] tags")
     itemlist = []
-    data = scrapertools.downloadpage(item.url)
+    data = scrapertools.cachePage(item.url)
     patron ='<li>[^<]{1}<small class="ico-tag-small sprite"></small>[^<]{1}<a href="([^"]+)" title="[^"]+">([^"]+)</a>[^<]{1}</li>'
     matches = re.compile(patron,re.DOTALL).findall(data)
     for url,title in matches:
@@ -91,7 +91,7 @@ def tags(item):
 def categorias(item):
     logger.info("[serviporno.py] categorias")
     itemlist = []
-    data = scrapertools.downloadpage(item.url)
+    data = scrapertools.cachePage(item.url)
     patron = '<div class="box-escena">[^<]{1}<a href="([^"]+)"><img src="([^"]+)" alt="Webcam" height="150" width="175" border=0 /></a>[^<]{1}<h4><a href="[^"]+">([^"]+)</a></h4>'
     matches = re.compile(patron,re.DOTALL).findall(data)
     for url,thumbnail, title  in matches:
@@ -102,7 +102,7 @@ def categorias(item):
 def play(item):
     logger.info("[serviporno.py] play")
     itemlist=[]
-    data = scrapertools.downloadpage(item.url)
+    data = scrapertools.cachePage(item.url)
     url= scrapertools.get_match(data,'},[^<]{21}{[^<]{25}url: \'([^"]+)\',[^<]{25}framesURL:' )
     itemlist.append( Item(channel=__channel__, action="play", server="directo", title=item.title , url=url , thumbnail=item.thumbnail , plot=item.plot , folder=False) )
 
