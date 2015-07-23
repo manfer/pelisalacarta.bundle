@@ -18,17 +18,19 @@ DEBUG = config.get_setting("debug")
 
 __category__ = "A"
 __type__ = "generic"
-__title__ = "newpct1"
+__title__ = "Newpct1"
 __channel__ = "newpct1"
+__adult__ = "false"
+__thumbnail__ = "http://s3.postimg.org/c7oceldcz/logof.jpg"
 __language__ = "ES"
 __creationdate__ = "20141102"
 
 def isGeneric():
     return True
-
+  
 def mainlist(item):
     logger.info("[newpct1.py] mainlist")
-        
+    
     itemlist = []
     itemlist.append( Item(channel=__channel__, action="submenu", title="Películas", url="http://www.newpct1.com/", extra="peliculas") )
     itemlist.append( Item(channel=__channel__, action="submenu", title="Series", url="http://www.newpct1.com/", extra="series") )
@@ -130,6 +132,11 @@ def listado(item):
                 url = 'http://www.newpct1.com/index.php?page=buscar&url=&letter=&q=%22' + title.replace(" ","%20")
                 url += '%22&categoryID=&categoryIDR=775&calidad=' + calidad.replace(" ","+") #HDTV+720p+AC3+5.1
                 url += '&idioma=&ordenar=Nombre&inon=Descendente'         
+            elif "1.com/series/" in url: 
+                extra="serie-tv"
+                url = 'http://www.newpct1.com/index.php?page=buscar&url=&letter=&q=%22' + title.replace(" ","%20")
+                url += '%22&categoryID=&categoryIDR=767&calidad=' + calidad.replace(" ","+") 
+                url += '&idioma=&ordenar=Nombre&inon=Descendente'  
             
         else:    
             title= title.replace("Descargar","",1).strip()
@@ -171,7 +178,8 @@ def completo(item):
                 categoryID=buscar_en_subcategoria(item.show,'1469')
             elif item_extra=="serie-vo":
                 categoryID=buscar_en_subcategoria(item.show,'775')
-                
+            elif item_extra=="serie-tv":
+                categoryID=buscar_en_subcategoria(item.show,'767')
             if categoryID !="":
                 item.url=item.url.replace("categoryID=","categoryID="+categoryID)
                 
@@ -245,9 +253,9 @@ def get_episodios(item):
     
     #<li><a href="http://www.newpct1.com/serie/forever/capitulo-101/" title="Serie Forever 1x01"><img src="http://www.newpct1.com/pictures/c/minis/1880_forever.jpg" alt="Serie Forever 1x01"></a> <div class="info"> <a href="http://www.newpct1.com/serie/forever/capitulo-101/" title="Serie Forever 1x01"><h2 style="padding:0;">Serie <strong style="color:red;background:none;">Forever - Temporada 1 </strong> - Temporada<span style="color:red;background:none;">[ 1 ]</span>Capitulo<span style="color:red;background:none;">[ 01 ]</span><span style="color:red;background:none;padding:0px;">Espa�ol Castellano</span> Calidad <span style="color:red;background:none;">[ HDTV ]</span></h2></a> <span>27-10-2014</span> <span>450 MB</span> <span class="color"><ahref="http://www.newpct1.com/serie/forever/capitulo-101/" title="Serie Forever 1x01"> Descargar</a> </div></li>
     #logger.info("[newpct1.py] get_episodios: " + fichas)
-    patron  = '<a href="([^"]+).*?' #url
+    patron  = '<li><a href="([^"]+).*?' #url
     patron += '<img src="([^"]+)".*?' #thumbnail
-    patron += '<h2 style="padding(.*?)/h2>.*?' #titulo, idioma y calidad
+    patron += '<h2 style="padding(.*?)/h2>' #titulo, idioma y calidad
     
     matches = re.compile(patron,re.DOTALL).findall(fichas)
     #logger.info("[newpct1.py] get_episodios matches: " + str(len(matches)))
@@ -315,9 +323,9 @@ def get_episodios(item):
 def buscar_en_subcategoria(titulo, categoria):
     data= scrapertools.cache_page("http://www.newpct1.com/pct1/library/include/ajax/get_subcategory.php", post="categoryIDR=" + categoria)
     data=data.replace("</option>"," </option>")
-    patron = '<option value="(\d+)">(' + titulo.replace(" ","\s") + '\s[^<]*)</option>'
-    #logger.info("[newpct1.py] buscar_en_subcategoria: data=" + data)
-    #logger.info("[newpct1.py] buscar_en_subcategoria: patron=" + patron)
+    patron = '<option value="(\d+)">(' + titulo.replace(" ","\s").replace("(","/(").replace(")","/)") + '\s[^<]*)</option>'
+    logger.info("[newpct1.py] buscar_en_subcategoria: data=" + data)
+    logger.info("[newpct1.py] buscar_en_subcategoria: patron=" + patron)
     matches = re.compile(patron,re.DOTALL | re.IGNORECASE).findall(data)
     
     if len(matches)==0: matches=[('','')]
@@ -326,8 +334,8 @@ def buscar_en_subcategoria(titulo, categoria):
     
 def findvideos(item):
     logger.info("[newpct1.py] findvideos")
-    itemlist=[]
-
+    itemlist=[]   
+          
     ## Cualquiera de las tres opciones son válidas
     #item.url = item.url.replace("1.com/","1.com/ver-online/")
     #item.url = item.url.replace("1.com/","1.com/descarga-directa/")
@@ -336,7 +344,7 @@ def findvideos(item):
     # Descarga la página
     data = re.sub(r"\n|\r|\t|\s{2}|(<!--.*?-->)","",scrapertools.cache_page(item.url))
     data = unicode( data, "iso-8859-1" , errors="replace" ).encode("utf-8")
-
+    
     title = scrapertools.find_single_match(data,"<h1><strong>([^<]+)</strong>[^<]+</h1>")
     title+= scrapertools.find_single_match(data,"<h1><strong>[^<]+</strong>([^<]+)</h1>")
     caratula = scrapertools.find_single_match(data,'<div class="entry-left">.*?src="([^"]+)"')
