@@ -26,7 +26,7 @@ FREE_SERVERS.extend(['vureel','nosvideo','videopremium','movreel','flashx','upaf
 FREE_SERVERS.extend(['fileflyer','playedto','tunepk','powvideo','videomega','mega','vidspot','netutv','rutube'])
 FREE_SERVERS.extend(['videozed','documentary','hugefiles', 'firedrive','videott','tumitv','gamovideo'])
 FREE_SERVERS.extend(['torrent','video4you','mailru','streaminto','backin','akstream', 'speedvideo', 'junkyvideo', 'rapidvideo', 'realvid', 'cloudzilla', 'fakingstv'])
-FREE_SERVERS.extend(['meuvideos', 'cumlouder','v4y','streamable','videostoring','youwatch'])
+FREE_SERVERS.extend(['meuvideos', 'cumlouder','v4y','streamable','videostoring','youwatch','sprutotv','turbovideos','xvideos'])
 
 # Lista de TODOS los servidores que funcionan con cuenta premium individual
 PREMIUM_SERVERS = ['uploadedto','nowvideo']
@@ -37,7 +37,7 @@ FILENIUM_SERVERS = []
 FILENIUM_SERVERS.extend(["nitroflare","lolabits","1fichier","dl","dl","mega","allmyvideos","allmyvideos","cliphunter","dailymotion","divxstage","facebook","filefactory","filepost","filesmonster","firedrive","gigasize","justin","k2s","keep2share","keep2share","letitbit","mediafire","metacafe","mitele","moevideos","netload","nowvideo","nowvideo","nowvideo","oboom","played","pornhub","rapidgator","rg","shareflare","streamcloud","turbobit","uploadable","uploaded","uploaded","ul","userporn","videoweed","vidspot","vimeo","vk","xenubox","youngpornvideos","youtube","zippyshare","lix","safelinking","linkto","2shared","4shared","hugefiles","nowdownload","nowdownload","tusfiles","uploading","uptobox"]);
 
 # Lista de TODOS los servidores soportados por Real-Debrid
-REALDEBRID_SERVERS = ['one80upload','tenupload','onefichier','onehostclick','twoshared','fourfastfile','fourshared','abc','asfile','badongo','bayfiles','bitshare','cbscom','cloudzer','cramit','crocko','cwtv','dailymotion','dateito',
+REALDEBRID_SERVERS = ['one80upload','allmyvideos','tenupload','onefichier','onehostclick','twoshared','fourfastfile','fourshared','abc','asfile','badongo','bayfiles','bitshare','cbscom','cloudzer','cramit','crocko','cwtv','dailymotion','dateito',
                     'dengee','diglo','extabit','fiberupload','filedino','filefactory','fileflyer','filekeen','filemade','filemates','fileover','filepost',
                    'filesend','filesmonster','filevelocity','freakshare','free','furk','fyels','gigasize','gigaup','glumbouploads','goldfile','hitfile','hipfile','hostingbulk',
                    'hotfile','hulkshare','hulu','ifile','jakfile','jumbofiles','justintv','letitbit','loadto','mediafire','mega','megashare','megashares','mixturevideo','muchshare','netload',
