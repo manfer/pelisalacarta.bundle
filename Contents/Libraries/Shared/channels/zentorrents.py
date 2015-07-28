@@ -668,6 +668,7 @@ def fanart(item):
 
     title ="Info"
     title = title.replace(title,bbcode_kodi2html("[COLOR skyblue]"+title+"[/COLOR]"))
+
     if len(item.extra)==0:
         fanart=item.thumbnail
     else:
@@ -700,13 +701,15 @@ def findvideos(item):
     
     patron = '<h1>(.*?)</h1>.*?'
     patron += 'src="([^"]+)".*?'
-    patron += '<a href.*?<a href="([^"]+)"'
+    patron += '<a href="/download([^"]+)"'
     
     
     matches = re.compile(patron,re.DOTALL).findall(data)
     scrapertools.printMatches(matches)
     
+    
     for scrapedtitulo, scrapedthumbnail, scrapedurl in matches:
+        scrapedurl= "/download"+scrapedurl
         if "series" in item.url :
             patron='<h1>.*?(\d+)x(\d+).*?'
             matches = re.compile(patron,re.DOTALL).findall(data)
@@ -784,6 +787,7 @@ def findvideos(item):
              scrapedtitulo= scrapedtitulo.replace(scrapedtitulo,bbcode_kodi2html("[COLOR bisque]"+scrapedtitulo+"[/COLOR]"))
              title= infotitle + scrapedtitulo
              scrapedurl = urlparse.urljoin(host,scrapedurl)
+             
              if "peliculas" in item.url:
                  thumbnail= item.category
              else:
@@ -815,14 +819,42 @@ def info(item):
     
     url=item.url
     data = scrapertools.cachePage(url)
-    data = re.sub(r"\n|\r|\t|\s{2}|\d+x\d+|&nbsp;","",data)
-    if  "web" in item.title or "1080" in item.title or "bluray" in item.title or  "HDRip" in item.title:
+    data = re.sub(r"\n|\r|\t|\s{2}|\d+x\d+|&(.*?);","",data)
+    if  "peliculas" in item.url:
     
         title= scrapertools.get_match(data,'<title>([^"]+) \[')
-    else:
+        plot = scrapertools.get_match(data,'</div></div><p>(.*?)</p>')
+        plot = plot.replace(plot,bbcode_kodi2html("[COLOR orange]"+plot+"[/COLOR]"))
+        plot = plot.replace("&aacute;","á")
+        plot = plot.replace("&iacute;","í")
+        plot = plot.replace("&eacute;","é")
+        plot = plot.replace("&oacute;","ó")
+        plot = plot.replace("&uacute;","ú")
+        plot = plot.replace("&ntilde;","ñ")
+        plot = plot.replace("&Aacute;","Á")
+        plot = plot.replace("&Iacute;","Í")
+        plot = plot.replace("&Eacute;","É")
+        plot = plot.replace("&Oacute;","Ó")
+        plot = plot.replace("&Uacute;","Ú")
+        plot = plot.replace("&Ntilde;","Ñ")
+        plot = plot.replace("<p>","")
+        plot = plot.replace("</p>","")
+        plot = plot.replace("&amp;quot;","")
+        plot = plot.replace("</strong>","")
+        plot = plot.replace("<strong>","")
+        if "series" in item.url:
+            foto= item.category
+            photo= item.extra
+        else:
+            
+            foto = item.show
+            photo= item.extra
+        ventana2 = TextBox1(title=title, plot=plot, thumbnail=photo, fanart=foto)
+        ventana2.doModal()
+    if "series" in item.url:
         title= scrapertools.get_match(data,'<title>([^"]+) -')
         title = title.replace(title,bbcode_kodi2html("[COLOR aqua][B]"+title+"[/B][/COLOR]"))
-        plot = scrapertools.get_match(data,'onload="imgLoaded.*?</div><p>(.*?)<p class="descauto">')
+        plot = scrapertools.get_match(data,'</div></div><p>(.*?)<p class="descauto">')
         plot = plot.replace(plot,bbcode_kodi2html("[COLOR orange]"+plot+"[/COLOR]"))
         plot = plot.replace("&aacute;","á")
         plot = plot.replace("&iacute;","í")
