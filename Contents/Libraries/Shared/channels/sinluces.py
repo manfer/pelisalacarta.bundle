@@ -32,11 +32,14 @@ def mainlist(item):
     logger.info("pelisalacarta.sinluces mainlist")
     itemlist = []
     title ="Estrenos"
-    itemlist.append( Item(channel=__channel__, title=title      , action="peliculas", url="http://www.sinluces.com/search/label/estreno", fanart="http://s17.postimg.org/rnup1a333/sinlestfan.jpg", thumbnail="http://s23.postimg.org/p1a2tyejv/sinlestthu.jpg"))
+    itemlist.append( Item(channel=__channel__, title=title      , action="peliculas", url="http://sinluces.com/page/1/", fanart="http://s17.postimg.org/rnup1a333/sinlestfan.jpg", thumbnail="http://s23.postimg.org/p1a2tyejv/sinlestthu.jpg"))
+    '''
     title ="HD"
     itemlist.append( Item(channel=__channel__, title=title      , action="peliculas", url="http://www.sinluces.com/search/label/HD", fanart="http://s11.postimg.org/6736sxxr7/sinlhdfan.jpg", thumbnail="http://s12.postimg.org/d5w5ojuql/sinlhdth.jpg"))
+    '''
     title ="Buscar"
     itemlist.append( Item(channel=__channel__, title=title      , action="search", url="", fanart="http://s22.postimg.org/3tz2v05ap/sinlbufan.jpg", thumbnail="http://s30.postimg.org/jhmn0u4jl/sinlbusthub.jpg"))
+    
     
 
     
@@ -47,9 +50,9 @@ def search(item,texto):
     logger.info("pelisalacarta.sinluces search")
     texto = texto.replace(" ","+")
     
-    item.url = "http://www.sinluces.com/search?q=%s" % (texto)
+    item.url = "http://sinluces.com/?s=%s" % (texto)
     try:
-        return peliculas(item)
+        return buscador(item)
     # Se captura la excepciÛn, para no interrumpir al buscador global si un canal falla
     except:
         import sys
@@ -57,6 +60,32 @@ def search(item,texto):
             logger.error( "%s" % line )
         return []
 
+def buscador(item):
+    logger.info("pelisalacarta.sinluces buscador")
+    itemlist = []
+    
+    
+    
+    # Descarga la página
+    data = scrapertools.cache_page(item.url)
+    data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;","",data)
+    patron  = '<div class="movie"><div class="imagen"><img src="([^"]+)" '
+    patron += 'alt="(.*?)".*?'
+    patron += '<a href="([^"]+)".*?'
+    patron += '<span class="icon-grade"></span>([^<]+)</div>'
+
+    matches = re.compile(patron,re.DOTALL).findall(data)
+    scrapertools.printMatches(matches)
+    if len(matches)==0 and  not "Error 404" in data:
+        itemlist.append( Item(channel=__channel__, title="No hay resultados...", thumbnail ="http://s6.postimg.org/55zljwr4h/sinnoisethumb.png", fanart ="http://s6.postimg.org/avfu47xap/sinnoisefan.jpg",folder=False) )
+
+
+    for scrapedthumbnail, scrapedtitle, scrapedurl, scrapedrate in matches:
+        scrapedtitle = scrapedtitle + scrapedrate
+        
+        itemlist.append( Item(channel=__channel__, action="fanart", title=scrapedtitle , url=scrapedurl , thumbnail=scrapedthumbnail ,  viewmode="movie", extra=scrapedtitle, fanart="http://s30.postimg.org/4gugdsygx/sinlucesfan.jpg", folder=True) )
+
+    return itemlist
 def peliculas(item,paginacion=True):
     logger.info("pelisalacarta.sinluces peliculas")
     itemlist = []
@@ -66,33 +95,40 @@ def peliculas(item,paginacion=True):
     # Descarga la página
     data = scrapertools.cache_page(item.url)
     data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;","",data)
-    patron  = '<div class=\'post hentry\'.*?'
-    patron += '<meta content=\'([^\']+)\'.*?'
-    patron += '<meta content.*?<meta content.*?<meta content=\'([^\']+)\'.*?'
-    patron += '<a class=\'imovie\' href=\'([^\']+)\''
+    patron  = '<div class="movie"><div class="imagen"><img src="([^"]+)" '
+    patron += 'alt="(.*?)".*?'
+    patron += '<a href="([^"]+)".*?'
+    patron += '<span class="icon-grade"></span>([^<]+)</div>'
     
     
     matches = re.compile(patron,re.DOTALL).findall(data)
     scrapertools.printMatches(matches)
-    if len(matches)==0 :
+    if len(matches)==0 and  not "Error 404" in data:
         itemlist.append( Item(channel=__channel__, title="No hay resultados...", thumbnail ="http://s6.postimg.org/55zljwr4h/sinnoisethumb.png", fanart ="http://s6.postimg.org/avfu47xap/sinnoisefan.jpg",folder=False) )
     
     
-    for scrapedthumbnail, scrapedtitle, scrapedurl in matches:
-        itemlist.append( Item(channel=__channel__, action="fanart", title=scrapedtitle , url=scrapedurl , thumbnail=scrapedthumbnail ,  viewmode="movie", extra=scrapedtitle, fanart="http://s30.postimg.org/4gugdsygx/sinlucesfan.jpg") )
+    for scrapedthumbnail, scrapedtitle, scrapedurl, scrapedrate in matches:
+        scrapedtitle = scrapedtitle + scrapedrate
+        
+        itemlist.append( Item(channel=__channel__, action="fanart", title=scrapedtitle , url=scrapedurl , thumbnail=scrapedthumbnail ,  viewmode="movie",  fanart="http://s30.postimg.org/4gugdsygx/sinlucesfan.jpg") )
         
         #paginacio
     
 
     # Extrae el paginador
     ## Paginación
-    patronvideos  = '<a class=\'blog-pager-older-link btn btn-primary\' href=\'([^\']+)\''
-    matches = re.compile(patronvideos,re.DOTALL).findall(data)
-    scrapertools.printMatches(matches)
-    if len(matches)>0:
-        scrapedurl = urlparse.urljoin(item.url,matches[0])
-        title ="siguiente>>"
-        itemlist.append( Item(channel=__channel__, action="peliculas", title=title , url=scrapedurl , thumbnail="http://s16.postimg.org/lvzzttkol/pelisvkflecha.png", fanart="http://s30.postimg.org/4gugdsygx/sinlucesfan.jpg" , folder=True) )
+    if  "Error 404" in data:
+        itemlist.append( Item(channel=__channel__, title="No hay mas paginas...", thumbnail ="http://s6.postimg.org/55zljwr4h/sinnoisethumb.png", fanart ="http://s6.postimg.org/avfu47xap/sinnoisefan.jpg",folder=False) )
+    else:
+        current_page_number = int(scrapertools.get_match(item.url,'page/(\d+)'))
+        item.url = re.sub(r"page/\d+","page/{0}",item.url)
+            
+        next_page_number = current_page_number +1
+        next_page = item.url.format(next_page_number)
+                    
+        title= "Pagina siguiente>>"
+        if  not "Error 404" in data:
+            itemlist.append( Item(channel=__channel__, title=title, url=next_page, fanart="http://s30.postimg.org/4gugdsygx/sinlucesfan.jpg", thumbnail="http://s16.postimg.org/lvzzttkol/pelisvkflecha.png", action="peliculas", folder=True) )
 
     return itemlist
 
@@ -102,7 +138,7 @@ def fanart(item):
     url = item.url
     data = scrapertools.cachePage(url)
     data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;","",data)
-    title= scrapertools.get_match(data,'<div class=\'post hentry\'.*?<meta content.*?<meta content.*?<meta content.*?<meta content=\'(.*?)\.*? \(')
+    title= scrapertools.get_match(data,'<title>Ver(.*?)pelic')
     title= re.sub(r"3D|SBS|-|","",title)
     title= title.replace('Ver','')
     title= title.replace('Online','')
@@ -111,35 +147,108 @@ def fanart(item):
     url="http://api.themoviedb.org/3/search/movie?api_key=57983e31fb435df4df77afb854740ea9&query=" + title + "&language=es&include_adult=false"
     data = scrapertools.cachePage(url)
     data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;","",data)
-    patron = '"page":1.*?"backdrop_path":"(.*?)".*?,"id"'
+    patron = '"page":1.*?"backdrop_path":"(.*?)".*?,"id":(.*?),'
     matches = re.compile(patron,re.DOTALL).findall(data)
     if len(matches)==0:
-        itemlist.append( Item(channel=__channel__, title=item.title, url=item.url, action="findvideos", thumbnail=item.thumbnail, fanart=item.thumbnail , folder=True) )
+       extra=item.thumbnail
+       show= item.thumbnail
+       category= item.thumbnail
+       itemlist.append( Item(channel=__channel__, title=item.title, url=item.url, action="findvideos", thumbnail=item.thumbnail, fanart=item.thumbnail ,extra=extra, show=show, category= category,folder=True) )
     else:
-        for fan in matches:
+        for fan, id in matches:
             fanart="https://image.tmdb.org/t/p/original" + fan
             item.extra= fanart
-    itemlist.append( Item(channel=__channel__, title =item.title , url=item.url, action="findvideos", thumbnail=item.thumbnail, fanart=item.extra, folder=True) )
-    #trailer
+    #fanart_2 y arts
+                
+            url ="http://assets.fanart.tv/v3/movies/"+id+"?api_key=6fa42b0ef3b5f3aab6a7edaa78675ac2"
+            data = scrapertools.cachePage(url)
+            data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;","",data)
+            patron = '"hdmovielogo":.*?"url": "([^"]+)"'
+            matches = re.compile(patron,re.DOTALL).findall(data)
+            if '"moviedisc"' in data:
+                disc = scrapertools.get_match(data,'"moviedisc":.*?"url": "([^"]+)"')
+            if '"movieposter"' in data:
+                poster = scrapertools.get_match(data,'"movieposter":.*?"url": "([^"]+)"')
+            if '"moviethumb"' in data:
+                thumb = scrapertools.get_match(data,'"moviethumb":.*?"url": "([^"]+)"')
+            if '"moviebanner"' in data:
+                 banner= scrapertools.get_match(data,'"moviebanner":.*?"url": "([^"]+)"')
+            
+            if len(matches)==0:
+               extra=  item.thumbnail
+               show = item.extra
+               category = item.extra
 
-    data = scrapertools.cache_page(item.url)
-    data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;","",data)
-    #logger.info("data="+data)
+               itemlist.append( Item(channel=__channel__, title = item.title , action="findvideos", url=item.url, server="torrent", thumbnail=item.thumbnail, fanart=item.extra,  extra=extra, show=show, category= category, folder=True) )
+        for logo in matches:
+            if '"hdmovieclearart"' in data:
+                clear=scrapertools.get_match(data,'"hdmovieclearart":.*?"url": "([^"]+)"')
+                if '"moviebackground"' in data:
+                    fanart_2=scrapertools.get_match(data,'"moviebackground":.*?"url": "([^"]+)"')
+                    extra=clear
+                    show= fanart_2
+                    if '"moviedisc"' in data:
+                        category= disc
+                    else:
+                         category= clear
+                    itemlist.append( Item(channel=__channel__, title = item.title , action="findvideos", url=item.url, server="torrent", thumbnail=logo, fanart=item.extra, extra=extra,show=show, category= category, folder=True) )
+                else:
+                    extra= clear
+                    show=item.extra
+                    if '"moviedisc"' in data:
+                        category = disc
+                    else:
+                        category = clear
+                    itemlist.append( Item(channel=__channel__, title = item.title , action="findvideos", url=item.url, server="torrent", thumbnail=logo, fanart=item.extra, extra=extra,show=show, category= category, folder=True) )
+
+            if '"moviebackground"' in data:
+                 fanart_2=scrapertools.get_match(data,'"moviebackground":.*?"url": "([^"]+)"')
+                 if '"hdmovieclearart"' in data:
+                     clear=scrapertools.get_match(data,'"hdmovieclearart":.*?"url": "([^"]+)"')
+                     extra=clear
+                     show= fanart_2
+                     if '"moviedisc"' in data:
+                         category= disc
+                     else:
+                          category= clear
+                
+                 else:
+                       extra=logo
+                       show= fanart_2
+                       if '"moviedisc"' in data:
+                            category= disc
+                       else:
+                            category= logo
+                       itemlist.append( Item(channel=__channel__, title = item.title , action="findvideos", url=item.url, server="torrent", thumbnail=logo, fanart=item.extra, extra=extra,show=show, category= category,  folder=True) )
     
-    
-    #trailer
-    patron = '<div class="tab-pane fade in active" id="trailer1">.*?'
-    patron += '<p><iframe.*?src="(//[^"]+)"'
-    
-    
-    matches = re.compile(patron,re.DOTALL).findall(data)
-    scrapertools.printMatches(matches)
-    
-    for scrapedurl in matches:
-        title ="Trailer"
-        itemlist.append( Item(channel=__channel__, action="trailer",  title=title  , url=scrapedurl , thumbnail=item.thumbnail , plot=item.plot , fulltitle = item.title , fanart=item.extra, folder=True) )
+            if not '"hdmovieclearart"' in data and not '"moviebackground"' in data:
+                    extra= logo
+                    show=  item.extra
+                    if '"moviedisc"' in data:
+                        category= disc
+                    else:
+                        category= item.extra
+                    itemlist.append( Item(channel=__channel__, title = item.title , action="findvideos", url=item.url, server="torrent", thumbnail=logo, fanart=item.extra,category= category, extra=extra,show=show ,  folder=True) )
+
     title ="Info"
-    itemlist.append( Item(channel=__channel__, action="info" , title=title , url=item.url, thumbnail=item.thumbnail, fanart=item.extra, folder=False ))
+    if len(item.extra)==0:
+       fanart=item.thumbnail
+    else:
+       fanart = item.extra
+       plot= item.extra
+    if '"movieposter"' in data:
+        thumbnail= poster
+    elif '"moviethumb"' in data:
+          thumbnail = thumb
+    
+    else:
+        thumbnail = item.thumbnail
+
+    itemlist.append( Item(channel=__channel__, action="info" , title=title , url=item.url, thumbnail=thumbnail,  fanart=fanart, extra = extra, show = show,folder=False ))
+
+
+
+
     return itemlist
 
 
@@ -154,83 +263,91 @@ def findvideos(item):
     # Descarga la pagina
     data = scrapertools.cache_page(item.url)
     data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;","",data)
-       #enlaces por idioma, calidad
-    patron = '<em>opción \d+, ([^<]+)</em>.*?'
-    # Datos que contienen los enlaces para sacarlos con servertools.findvideos
-    patron+= '<div class="contenedor_tab">(.*?)<div style="clear:both;">'
-    matches = re.compile(patron,re.DOTALL).findall(data)
-
-    for idioma, datosEnlaces in matches:
-        
-        listavideos = servertools.findvideos(datosEnlaces)
-        
     
-        for video in listavideos:
-            videotitle = scrapertools.unescape(video[0])+"-"+idioma
-            url = video[1]
-            server = video[2]
-            title_first="Ver en--"
-            title= title_first + videotitle
-            itemlist.append( Item(channel=__channel__, action="play", server=server, title=title , url=url , thumbnail=item.thumbnail , fulltitle = item.title , fanart = item.fanart, folder=False) )
-
-
-    if not "opción 1" in data :
-           # idioma, calidad
-           patron = '<strong>.*?</strong>.*?">([^<]+)</span>].*?'
-
-           # Datos que contienen los enlaces para sacarlos con servertools.findvideos
-           patron += '<div class="contenedor_tab">(.*?)<div style="clear:both;">'
-           matches = re.compile(patron,re.DOTALL).findall(data)
     
-    for idioma, datosEnlaces in matches:
         
-        listavideos = servertools.findvideos(datosEnlaces)
-        
-        for video in listavideos:
-            videotitle = scrapertools.unescape(video[0])+"-"+idioma
-            url = video[1]
-            server = video[2]
-            title_first="Ver en--"
-            title= title_first + videotitle
-            itemlist.append( Item(channel=__channel__, action="play", server=server, title=title  , url=url , thumbnail=item.thumbnail , fulltitle = item.title , fanart = item.fanart, folder=False) )
-
-
-    # Datos que contienen los enlaces para sacarlos con servertools.findvideos
-    patron = 'ovideo\d+"><p><iframe src=(.*?)<div class="alert alert-warning visible-phone">'
-    matches = re.compile(patron,re.DOTALL).findall(data)
-    for  datosEnlaces in matches:
-        
-        listavideos = servertools.findvideos(datosEnlaces)
-        
-        
-        for video in listavideos:
-            videotitle = scrapertools.unescape(video[0])
-            url = video[1]
-            server = video[2]
-            title_first="Ver en--"
-            title= title_first + videotitle
-            itemlist.append( Item(channel=__channel__, action="play", server=server, title=title , url=url , thumbnail=item.thumbnail , fulltitle = item.title , fanart = item.fanart, folder=False) )
-
-
-
-    return itemlist
-
-
-def trailer(item):
-    logger.info("pelisalacarta.sinluces play url="+item.url)
-    
-    itemlist = servertools.find_video_items(data=item.url)
-    
-    for videoitem in itemlist:
-        videoitem.title_first= "Ver en--"
-        videoitem.title_second = "Youtube"
-        videoitem.title= videoitem.title_first + videoitem.title_second
-        videoitem.channel = __channel__
-        videoitem.fanart = "http://s23.postimg.org/84vkeq863/movietrailers.jpg"
-        videoitem.thumbnail = item.thumbnail
-    
        
+    #extra enlaces
     
+    
+    patron= '<div class="play-c">(.*?)<div class="datos">'
+    
+    matches = re.compile(patron,re.DOTALL).findall(data)
+
+    if not "hqq" in data:
+        itemlist.append( Item(channel=__channel__, title="Sin servidores para Pelisalacarta...", thumbnail ="http://s6.postimg.org/55zljwr4h/sinnoisethumb.png", fanart ="http://s6.postimg.org/avfu47xap/sinnoisefan.jpg",folder=False) )
+   
+    for bloque_enlaces_idiomas in matches:
+        patronenlaces= '<div id="play-(.*?)".*?src="([^"]+)"'
+        matchesenlaces = re.compile(patronenlaces,re.DOTALL).findall(bloque_enlaces_idiomas)
+        patronidiomas= '<a href="#play-(.*?)">([^<]+)'
+        matchesidiomas = re.compile(patronidiomas,re.DOTALL).findall(bloque_enlaces_idiomas)
+        for numero, scrapedurl in matchesenlaces:
+            url=scrapedurl
+            for numero2, idiomas in matchesidiomas:
+                if numero == numero2:
+                   title = idiomas
+                   idiomas= re.sub(r"[0-9]","",idiomas)
+                   listavideos = servertools.findvideos(url)
+                   for video in listavideos:
+                    
+                       videotitle = scrapertools.unescape(video[0])+"-"+idiomas
+                       url = video[1]
+                       server = video[2]
+                       title_first="Ver en--"
+                       title= title_first + videotitle
+
+                       itemlist.append( Item(channel=__channel__, action="play", server=server, title=title , url=url , thumbnail=item.extra , fulltitle = item.title , fanart = item.show, folder=False) )
+
+
+        #otro patronenlaces
+        patronenlaces= '<div id="play-(.*?)".*?src=\'([^\']+)\''
+        matchesenlaces = re.compile(patronenlaces,re.DOTALL).findall(bloque_enlaces_idiomas)
+        patronidiomas= '<a href="#play-(.*?)">([^<]+)'
+        matchesidiomas = re.compile(patronidiomas,re.DOTALL).findall(bloque_enlaces_idiomas)
+        for numero, url in matchesenlaces:
+            pepe=url
+            for numero2, idiomas in matchesidiomas:
+                if numero == numero2:
+                   title = idiomas
+                   idiomas= re.sub(r"[0-9]","",idiomas)
+                   listavideos = servertools.findvideos(pepe)
+                   for video in listavideos:
+                       
+                       videotitle = scrapertools.unescape(video[0])+"-"+idiomas
+                       url = video[1]
+                       server = video[2]
+                       title_first="Ver en--"
+                       title= title_first + videotitle
+                           
+                       itemlist.append( Item(channel=__channel__, action="play", server=server, title=title , url=url , thumbnail=item.extra , fulltitle = item.title , fanart = item.show, folder=False) )
+    
+
+        patron = '<em>opción \d+, ([^<]+)</em>.*?'
+        # Datos que contienen los enlaces para sacarlos con servertools.findvideos
+        patron+= '<div class="contenedor_tab">(.*?)<div style="clear:both;">'
+        matches = re.compile(patron,re.DOTALL).findall(data)
+    
+        for idioma, datosEnlaces in matches:
+        
+            listavideos = servertools.findvideos(datosEnlaces)
+        
+        
+            for video in listavideos:
+                videotitle = scrapertools.unescape(video[0])+"-"+idioma
+                url = video[1]
+                server = video[2]
+                title_first="Ver en--"
+                title= title_first + videotitle
+                itemlist.append( Item(channel=__channel__, action="play", server=server, title=title , url=url , thumbnail=item.extra , fulltitle = item.title , fanart = item.show, folder=False) )
+
+
+
+            
+        
+            
+
+
 
     return itemlist
 
@@ -239,56 +356,27 @@ def info(item):
     url=item.url
     data = scrapertools.cachePage(url)
     data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;","",data)
-    title= scrapertools.get_match(data,'<div class=\'post hentry\'.*?<meta content.*?<meta content.*?<meta content.*?<meta content=\'(.*?)\.*? \(')
+    title= scrapertools.get_match(data,'<title>Ver(.*?)pelic')
     title = title.replace("Ver","")
-    scrapedplot = scrapertools.get_match(data,'<div class=\'fltl ipost-de\'><div><span><i class=\'icon icon-ok\'>(.*?)</div></div>')
-    plotformat = re.compile('</i> (.*?)</span>',re.DOTALL).findall(scrapedplot)
-    for plot in plotformat:
-        scrapedplot = scrapedplot.replace("</span>","\n")
-        scrapedplot = scrapedplot.replace("</i>","")
-        scrapedplot = scrapedplot.replace("&#8220","")
-        scrapedplot = scrapedplot.replace("<b>","")
-        scrapedplot = scrapedplot.replace("</b>","")
-        scrapedplot = scrapedplot.replace(" &#8203;&#8203;","")
-        scrapedplot = scrapedplot.replace("&#8230","")
-        scrapedplot = scrapedplot.replace("</div> </div> <div class='clear'>","")
-        scrapedplot = scrapedplot.replace("</div><div><span><i class='icon icon-ok'>","\n")
-    fanart="http://s11.postimg.org/qu66qpjz7/zentorrentsfanart.jpg"
-    tbd = TextBox("DialogTextViewer.xml", os.getcwd(), "Default")
-    tbd.ask(title, scrapedplot,fanart)
-    del tbd
-    return
+    plot = scrapertools.get_match(data,'<h2>Sinopsis.*?<p>([^<]+).*?</p>')
+   
+    plot = plot.replace("</span>","")
+    plot = plot.replace("</i>","")
+    plot = plot.replace("&#8220","")
+    plot = plot.replace("<b>","")
+    plot = plot.replace("</b>","")
+    plot = plot.replace(" &#8203;&#8203;","")
+    plot = plot.replace("&#8230","")
+    plot = plot.replace("</div> </div> <div class='clear'>","")
+    plot = plot.replace("</div><div><span><i class='icon icon-ok'>","")
+    foto = item.show
+    photo= item.extra
 
-try:
-    import xbmc, xbmcgui
-    class TextBox( xbmcgui.WindowXMLDialog ):
-        """ Create a skinned textbox window """
-        def __init__( self, *args, **kwargs):
-            
-            pass
-        
-        def onInit( self ):
-            try:
-                self.getControl( 5 ).setText( self.text )
-                self.getControl( 1 ).setLabel( self.title )
-            except: pass
-        
-        def onClick( self, controlId ):
-            pass
-        
-        def onFocus( self, controlId ):
-            pass
-        
-        def onAction( self, action ):
-            self.close()
-        
-        def ask(self, title, text, image ):
-            self.title = title
-            self.text = text
-            self.doModal()
+    ventana2 = TextBox1(title=title, plot=plot, thumbnail=photo, fanart=foto)
+    ventana2.doModal()
 
-except:
-    pass
+def test():
+    return True
 
 
 
